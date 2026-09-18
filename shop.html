@@ -1,0 +1,6511 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>Tarot Journal ✦ Private Studio</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root{
+  --bg:#fff9f6;
+  --card:#fffdfb;
+  --pink:#f4bfd1;
+  --pink2:#ffe8ef;
+  --lav:#ddd2f5;
+  --lav2:#f1edff;
+  --rose:#ad637c;
+  --ink:#5a4b52;
+  --muted:#94858b;
+  --line:#eee0e5;
+  --green:#6d9b82;
+  --yellow:#c49350;
+  --red:#c96d7a;
+  --shadow:0 15px 35px rgba(103,72,87,.08);
+}
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  background:
+    radial-gradient(circle at 5% 0,#ffe9f1 0,transparent 25%),
+    radial-gradient(circle at 100% 10%,#eee9ff 0,transparent 27%),
+    var(--bg);
+  color:var(--ink);
+  font-family:
+    system-ui,
+    -apple-system,
+    "Noto Sans Thai",
+    sans-serif;
+}
+
+button,
+input,
+textarea,
+select{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+.hidden{
+  display:none!important;
+}
+
+/* TOP BAR */
+
+.top{
+  position:sticky;
+  top:0;
+  z-index:20;
+  background:#fffaf5dd;
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--line);
+}
+
+.topin{
+  max-width:1250px;
+  margin:auto;
+  padding:12px 18px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:800;
+}
+
+.logo{
+  width:43px;
+  height:43px;
+  border-radius:15px;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(
+    135deg,
+    var(--pink2),
+    var(--lav2)
+  );
+  font-size:22px;
+}
+
+.brand small{
+  display:block;
+  font-size:10px;
+  color:var(--muted);
+}
+
+.spacer{
+  flex:1;
+}
+
+.pill{
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius:99px;
+  padding:8px 12px;
+  font-size:12px;
+  color:var(--muted);
+}
+
+/* LAYOUT */
+
+.layout{
+  max-width:1250px;
+  margin:auto;
+  padding:20px;
+  display:grid;
+  grid-template-columns:215px 1fr;
+  gap:20px;
+}
+
+.side{
+  height:max-content;
+  position:sticky;
+  top:76px;
+  background:#fffdfbe8;
+  border:1px solid var(--line);
+  border-radius:24px;
+  padding:10px;
+  box-shadow:var(--shadow);
+}
+
+.nav{
+  width:100%;
+  border:0;
+  background:transparent;
+  text-align:left;
+  border-radius:14px;
+  padding:11px 12px;
+  color:var(--ink);
+  font-weight:700;
+}
+
+.nav:hover,
+.nav.active{
+  background:
+    linear-gradient(
+      135deg,
+      #fff0f5,
+      #f3efff
+    );
+  color:var(--rose);
+}
+
+.main{
+  min-width:0;
+}
+
+/* HERO */
+
+.hero{
+  position:relative;
+  overflow:hidden;
+  border:1px solid var(--line);
+  border-radius:28px;
+  padding:27px;
+  background:
+    linear-gradient(
+      135deg,
+      #ffe9f0,
+      #f0ebff
+    );
+  box-shadow:var(--shadow);
+  margin-bottom:16px;
+}
+
+.hero:after{
+  content:"☾  ✦  ♡";
+  position:absolute;
+  right:20px;
+  top:15px;
+  color:#9e789033;
+  font-size:35px;
+  letter-spacing:8px;
+}
+
+.hero h1{
+  margin:0 0 4px;
+  font-size:28px;
+}
+
+.hero p{
+  margin:0;
+  color:var(--muted);
+}
+
+/* BUTTONS */
+
+.btn{
+  border:0;
+  border-radius:14px;
+  padding:10px 14px;
+  font-weight:800;
+  box-shadow:0 5px 12px #80616d10;
+}
+
+.primary{
+  background:
+    linear-gradient(
+      135deg,
+      #d98da7,
+      #aa7bc8
+    );
+  color:white;
+}
+
+.soft{
+  background:var(--pink2);
+  color:#98546d;
+}
+
+.lav{
+  background:var(--lav2);
+  color:#705b9c;
+}
+
+.ghost{
+  background:white;
+  border:1px solid var(--line);
+  box-shadow:none;
+}
+
+.danger{
+  background:#fff0f2;
+  color:#b55d6b;
+}
+
+.small{
+  padding:7px 10px;
+  font-size:12px;
+}
+
+/* STATS */
+
+.stats{
+  display:grid;
+  grid-template-columns:
+    repeat(4,1fr);
+  gap:12px;
+}
+
+.stat,
+.card{
+  background:#fffdfbf2;
+  border:1px solid var(--line);
+  border-radius:21px;
+  box-shadow:var(--shadow);
+}
+
+.stat{
+  padding:15px;
+  min-height:110px;
+}
+
+.stathead{
+  display:flex;
+  justify-content:space-between;
+  color:var(--muted);
+  font-size:12px;
+  font-weight:800;
+}
+
+.ico{
+  width:34px;
+  height:34px;
+  border-radius:12px;
+  display:grid;
+  place-items:center;
+  background:var(--pink2);
+}
+
+.stat strong{
+  font-size:28px;
+  display:block;
+  margin-top:9px;
+}
+
+.stat small{
+  color:var(--muted);
+}
+
+/* DASHBOARD */
+
+.title{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin:24px 0 11px;
+}
+
+.title h2{
+  margin:0;
+  font-size:18px;
+}
+
+.title p{
+  margin:3px 0 0;
+  color:var(--muted);
+  font-size:12px;
+}
+
+.grid2{
+  display:grid;
+  grid-template-columns:
+    1.2fr .8fr;
+  gap:14px;
+}
+
+.grid3{
+  display:grid;
+  grid-template-columns:
+    repeat(3,1fr);
+  gap:14px;
+}
+
+.card{
+  padding:17px;
+}
+
+/* GRAPH */
+
+.chart{
+  height:280px;
+}
+
+.bars{
+  height:210px;
+  display:flex;
+  align-items:end;
+  gap:10px;
+}
+
+.barcol{
+  height:100%;
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  justify-content:end;
+  align-items:center;
+  gap:5px;
+}
+
+.bar{
+  width:min(34px,75%);
+  border-radius:
+    12px 12px 5px 5px;
+  background:
+    linear-gradient(
+      #d88da8,
+      #a783c6
+    );
+  min-height:4px;
+}
+
+.barlabel,
+.barvalue{
+  font-size:11px;
+  color:var(--muted);
+}
+
+/* LIST */
+
+.list{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:11px;
+  border:1px solid var(--line);
+  border-radius:15px;
+  background:#fff9fc;
+}
+
+.grow{
+  flex:1;
+  min-width:0;
+}
+
+.item b{
+  display:block;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.muted{
+  font-size:12px;
+  color:var(--muted);
+}
+
+/* STATUS */
+
+.badge{
+  display:inline-flex;
+  padding:5px 8px;
+  border-radius:99px;
+  font-size:11px;
+  font-weight:800;
+  background:#f4edf0;
+  color:#7d6971;
+}
+
+.green{
+  background:#edf8f1;
+  color:#5d8e73;
+}
+
+.yellow{
+  background:#fff6e6;
+  color:#ad7c37;
+}
+
+.red{
+  background:#fff0f2;
+  color:#b85c6b;
+}
+
+.purple{
+  background:#f0ecff;
+  color:#735fa0;
+}
+
+/* PAGE */
+
+.pagehead{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin-bottom:15px;
+}
+
+.pagehead h1{
+  margin:0;
+  font-size:25px;
+}
+
+.pagehead p{
+  margin:4px 0 0;
+  color:var(--muted);
+  font-size:13px;
+}
+
+.toolbar{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-bottom:13px;
+}
+
+/* FORM */
+
+.input,
+.select,
+.textarea{
+  width:100%;
+  border:1px solid var(--line);
+  background:#fffdfc;
+  border-radius:13px;
+  padding:10px 12px;
+  color:var(--ink);
+  outline:none;
+}
+
+.textarea{
+  min-height:110px;
+  resize:vertical;
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus{
+  border-color:#d9aec0;
+  box-shadow:
+    0 0 0 4px #f5dce544;
+}
+
+.search{
+  max-width:350px;
+}
+
+.form{
+  display:grid;
+  grid-template-columns:
+    1fr 1fr;
+  gap:12px;
+}
+
+.full{
+  grid-column:1/-1;
+}
+
+.field label{
+  display:block;
+  font-size:12px;
+  font-weight:800;
+  margin-bottom:5px;
+  color:#806d75;
+}
+
+/* TABLE */
+
+.table{
+  width:100%;
+  border-collapse:
+    separate;
+  border-spacing:
+    0 7px;
+}
+
+.table th{
+  text-align:left;
+  font-size:11px;
+  color:#9a898f;
+  padding:0 9px;
+}
+
+.table td{
+  background:#fffdfc;
+  border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+  padding:11px 9px;
+  font-size:13px;
+}
+
+.table td:first-child{
+  border-left:1px solid var(--line);
+  border-radius:
+    13px 0 0 13px;
+}
+
+.table td:last-child{
+  border-right:1px solid var(--line);
+  border-radius:
+    0 13px 13px 0;
+}
+
+.actions{
+  display:flex;
+  gap:5px;
+  flex-wrap:wrap;
+}
+
+/* CARD EDITOR */
+
+.cardrow{
+  display:grid;
+  grid-template-columns:
+    45px 1.1fr 115px 1.5fr auto;
+  gap:8px;
+  align-items:start;
+  padding:12px;
+  border:1px solid var(--line);
+  background:#fff9fc;
+  border-radius:17px;
+  margin-bottom:9px;
+}
+
+.sectionrow{
+  display:grid;
+  grid-template-columns:
+    1fr 2fr auto;
+  gap:8px;
+  padding:12px;
+  border:1px solid var(--line);
+  background:#fff9fc;
+  border-radius:17px;
+  margin-bottom:9px;
+}
+
+.save{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  color:var(--muted);
+  font-size:12px;
+}
+
+.dot{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:#bbb;
+}
+
+.saving{
+  background:#d9a064;
+}
+
+.saved{
+  background:#72a181;
+}
+
+.empty{
+  text-align:center;
+  padding:28px;
+  color:var(--muted);
+}
+
+/* LOGIN */
+
+.login{
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  padding:20px;
+}
+
+.loginbox{
+  width:min(430px,100%);
+  background:#fffdfb;
+  border:1px solid var(--line);
+  border-radius:30px;
+  padding:28px;
+  box-shadow:var(--shadow);
+}
+
+.loginart{
+  text-align:center;
+  font-size:44px;
+}
+
+.loginbox h1{
+  text-align:center;
+  margin:3px;
+}
+
+.loginbox p{
+  text-align:center;
+  color:var(--muted);
+  font-size:13px;
+}
+
+/* MODAL */
+
+.modal{
+  position:fixed;
+  inset:0;
+  background:#493d4480;
+  z-index:50;
+  display:grid;
+  place-items:center;
+  padding:18px;
+}
+
+.modalbox{
+  width:min(680px,100%);
+  max-height:90vh;
+  overflow:auto;
+  background:#fffdfb;
+  border-radius:25px;
+  padding:20px;
+}
+
+.modalhead{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.modalhead h2{
+  margin:0;
+  font-size:19px;
+}
+
+.toast{
+  position:fixed;
+  right:18px;
+  bottom:18px;
+  z-index:100;
+  background:#5b4d54;
+  color:#fff;
+  padding:12px 15px;
+  border-radius:14px;
+  font-size:13px;
+}
+
+/* MOBILE */
+
+@media(max-width:950px){
+
+  .layout{
+    grid-template-columns:1fr;
+  }
+
+  .side{
+    position:static;
+    display:flex;
+    overflow:auto;
+  }
+
+  .nav{
+    white-space:nowrap;
+    width:auto;
+  }
+
+  .stats{
+    grid-template-columns:
+      repeat(2,1fr);
+  }
+
+  .grid2,
+  .grid3{
+    grid-template-columns:1fr;
+  }
+
+  .form{
+    grid-template-columns:1fr;
+  }
+
+  .full{
+    grid-column:auto;
+  }
+
+  .cardrow{
+    grid-template-columns:
+      45px 1fr 115px;
+  }
+
+  .cardrow .interpret{
+    grid-column:2/-1;
+  }
+
+  .sectionrow{
+    grid-template-columns:1fr;
+  }
+
+  .side{
+    gap:3px;
+  }
+}
+
+@media(max-width:560px){
+
+  .layout{
+    padding:12px;
+  }
+
+  .topin{
+    padding:10px 12px;
+  }
+
+  .pill{
+    display:none;
+  }
+
+  .hero{
+    padding:21px;
+  }
+
+  .hero h1{
+    font-size:23px;
+  }
+
+  .stats{
+    gap:7px;
+  }
+
+  .stat{
+    padding:12px;
+  }
+
+  .stat strong{
+    font-size:23px;
+  }
+
+  .table{
+    display:block;
+    overflow:auto;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+
+<div id="login" class="login">
+
+  <div class="loginbox">
+
+    <div class="loginart">
+      🔮 ✦ ☾
+    </div>
+
+    <h1>Tarot Journal</h1>
+
+    <p>
+      Private Studio ·
+      พื้นที่จัดการงานอ่านไพ่ของคุณ
+    </p>
+
+    <form id="loginForm">
+
+      <div class="field" style="margin-top:18px">
+        <label>อีเมล</label>
+
+        <input
+          id="email"
+          class="input"
+          type="email"
+          value="goguhuukii@gmail.com"
+          required
+        >
+      </div>
+
+      <div
+        class="field"
+        style="margin-top:10px"
+      >
+        <label>รหัสผ่าน</label>
+
+        <input
+          id="password"
+          class="input"
+          type="password"
+          required
+        >
+      </div>
+
+      <button
+        class="btn primary"
+        style="width:100%;margin-top:15px"
+      >
+        เข้าสู่ระบบ ✦
+      </button>
+
+      <div
+        id="loginErr"
+        class="muted"
+        style="text-align:center;margin-top:9px"
+      ></div>
+
+    </form>
+
+  </div>
+
+</div>
+
+
+<!-- APP -->
+
+<div id="app" class="hidden">
+
+<header class="top">
+
+  <div class="topin">
+
+    <div class="brand">
+
+      <div class="logo">
+        🔮
+      </div>
+
+      <div>
+        Tarot Journal
+        <small>
+          private studio
+        </small>
+      </div>
+
+    </div>
+
+    <div class="spacer"></div>
+
+    <span
+      id="user"
+      class="pill"
+    ></span>
+
+    <button
+      class="btn ghost small"
+      onclick="logout()"
+    >
+      ออกจากระบบ
+    </button>
+
+  </div>
+
+</header>
+
+
+<div class="layout">
+
+<aside class="side">
+
+  <button
+    class="nav active"
+    data-p="dashboard"
+    onclick="page('dashboard')"
+  >
+    🏠 หน้าแรก
+  </button>
+
+  <button
+    class="nav"
+    data-p="members"
+    onclick="page('members')"
+  >
+    💕 สมาชิก
+  </button>
+
+  <button
+    class="nav"
+    data-p="services"
+    onclick="page('services')"
+  >
+    ✨ บริการ
+  </button>
+
+  <button
+    class="nav"
+    data-p="readings"
+    onclick="page('readings')"
+  >
+    🃏 งานอ่านไพ่
+  </button>
+
+  <button
+    class="nav"
+    data-p="templates"
+    onclick="page('templates')"
+  >
+    🌷 Templates
+  </button>
+
+  <button
+    class="nav"
+    data-p="reviews"
+    onclick="page('reviews')"
+  >
+    💌 รีวิว
+  </button>
+
+</aside>
+
+
+<main class="main">
+
+<section id="dashboard"></section>
+
+<section
+  id="members"
+  class="hidden"
+></section>
+
+<section
+  id="services"
+  class="hidden"
+></section>
+
+<section
+  id="readings"
+  class="hidden"
+></section>
+
+<section
+  id="editor"
+  class="hidden"
+></section>
+
+<section
+  id="templates"
+  class="hidden"
+></section>
+
+<section
+  id="reviews"
+  class="hidden"
+></section>
+
+</main>
+
+</div>
+</div>
+
+
+<!-- MODAL -->
+
+<div
+  id="modal"
+  class="modal hidden"
+>
+
+  <div class="modalbox">
+
+    <div class="modalhead">
+
+      <h2 id="mt"></h2>
+
+      <button
+        class="btn ghost small"
+        onclick="closeModal()"
+      >
+        ปิด
+      </button>
+
+    </div>
+
+    <div
+      id="mb"
+      style="margin-top:14px"
+    ></div>
+
+  </div>
+
+</div>
+
+
+<div
+  id="toast"
+  class="toast hidden"
+></div>
+
+
+<script>
+
+/* =========================================================
+   SUPABASE
+========================================================= */
+
+const SUPABASE_URL =
+  "https://lgjkhxvgsjuezvntnnlf.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_2WLT-8UgnvpRZL2LLWPElA_-4iqZ7Mh";
+
+const sb =
+  supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
+
+
+/* =========================================================
+   TAROT 78 CARDS
+========================================================= */
+
+const CARDS = [
+
+  ["major-00","The Fool"],
+  ["major-01","The Magician"],
+  ["major-02","The High Priestess"],
+  ["major-03","The Empress"],
+  ["major-04","The Emperor"],
+  ["major-05","The Hierophant"],
+  ["major-06","The Lovers"],
+  ["major-07","The Chariot"],
+  ["major-08","Strength"],
+  ["major-09","The Hermit"],
+  ["major-10","Wheel of Fortune"],
+  ["major-11","Justice"],
+  ["major-12","The Hanged Man"],
+  ["major-13","Death"],
+  ["major-14","Temperance"],
+  ["major-15","The Devil"],
+  ["major-16","The Tower"],
+  ["major-17","The Star"],
+  ["major-18","The Moon"],
+  ["major-19","The Sun"],
+  ["major-20","Judgement"],
+  ["major-21","The World"],
+
+  ["wands-ace","Ace of Wands"],
+  ["wands-2","Two of Wands"],
+  ["wands-3","Three of Wands"],
+  ["wands-4","Four of Wands"],
+  ["wands-5","Five of Wands"],
+  ["wands-6","Six of Wands"],
+  ["wands-7","Seven of Wands"],
+  ["wands-8","Eight of Wands"],
+  ["wands-9","Nine of Wands"],
+  ["wands-10","Ten of Wands"],
+  ["wands-page","Page of Wands"],
+  ["wands-knight","Knight of Wands"],
+  ["wands-queen","Queen of Wands"],
+  ["wands-king","King of Wands"],
+
+  ["cups-ace","Ace of Cups"],
+  ["cups-2","Two of Cups"],
+  ["cups-3","Three of Cups"],
+  ["cups-4","Four of Cups"],
+  ["cups-5","Five of Cups"],
+  ["cups-6","Six of Cups"],
+  ["cups-7","Seven of Cups"],
+  ["cups-8","Eight of Cups"],
+  ["cups-9","Nine of Cups"],
+  ["cups-10","Ten of Cups"],
+  ["cups-page","Page of Cups"],
+  ["cups-knight","Knight of Cups"],
+  ["cups-queen","Queen of Cups"],
+  ["cups-king","King of Cups"],
+
+  ["swords-ace","Ace of Swords"],
+  ["swords-2","Two of Swords"],
+  ["swords-3","Three of Swords"],
+  ["swords-4","Four of Swords"],
+  ["swords-5","Five of Swords"],
+  ["swords-6","Six of Swords"],
+  ["swords-7","Seven of Swords"],
+  ["swords-8","Eight of Swords"],
+  ["swords-9","Nine of Swords"],
+  ["swords-10","Ten of Swords"],
+  ["swords-page","Page of Swords"],
+  ["swords-knight","Knight of Swords"],
+  ["swords-queen","Queen of Swords"],
+  ["swords-king","King of Swords"],
+
+  ["pentacles-ace","Ace of Pentacles"],
+  ["pentacles-2","Two of Pentacles"],
+  ["pentacles-3","Three of Pentacles"],
+  ["pentacles-4","Four of Pentacles"],
+  ["pentacles-5","Five of Pentacles"],
+  ["pentacles-6","Six of Pentacles"],
+  ["pentacles-7","Seven of Pentacles"],
+  ["pentacles-8","Eight of Pentacles"],
+  ["pentacles-9","Nine of Pentacles"],
+  ["pentacles-10","Ten of Pentacles"],
+  ["pentacles-page","Page of Pentacles"],
+  ["pentacles-knight","Knight of Pentacles"],
+  ["pentacles-queen","Queen of Pentacles"],
+  ["pentacles-king","King of Pentacles"]
+
+];
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+const STATUS = {
+
+  pending:
+    ["รอเริ่ม","yellow"],
+
+  reading:
+    ["กำลังอ่าน","purple"],
+
+  draft:
+    ["ฉบับร่าง","yellow"],
+
+  completed:
+    ["อ่านเสร็จ","green"],
+
+  sent:
+    ["ส่งแล้ว","green"],
+
+  checked:
+    ["เช็กแล้ว","green"],
+
+  closed:
+    ["ปิดงาน","green"],
+
+  cancelled:
+    ["ยกเลิก","red"]
+
+};
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let members = [];
+let services = [];
+let readings = [];
+let templates = [];
+let reviews = [];
+
+let current = null;
+let cards = [];
+let sections = [];
+
+let timer;
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+const $ = x =>
+  document.getElementById(x);
+
+const esc = x =>
+  String(x ?? "")
+    .replace(
+      /[&<>"']/g,
+      m => ({
+        "&":"&amp;",
+        "<":"&lt;",
+        ">":"&gt;",
+        '"':"&quot;",
+        "'":"&#039;"
+      }[m])
+    );
+
+function toast(message){
+
+  $("toast").textContent =
+    message;
+
+  $("toast")
+    .classList
+    .remove("hidden");
+
+  setTimeout(
+    () =>
+      $("toast")
+        .classList
+        .add("hidden"),
+    2200
+  );
+
+}
+
+
+function fmt(value){
+
+  if(!value)
+    return "-";
+
+  return new Date(value)
+    .toLocaleString(
+      "th-TH",
+      {
+        dateStyle:"medium",
+        timeStyle:"short"
+      }
+    );
+
+}
+
+
+function dt(value){
+
+  if(!value)
+    return "";
+
+  const d =
+    new Date(value);
+
+  const p =
+    n =>
+      String(n)
+        .padStart(2,"0");
+
+  return `${d.getFullYear()}-${p(
+    d.getMonth()+1
+  )}-${p(
+    d.getDate()
+  )}T${p(
+    d.getHours()
+  )}:${p(
+    d.getMinutes()
+  )}`;
+
+}
+
+
+function badge(status){
+
+  const data =
+    STATUS[status] ||
+    [status,""];
+
+  return `
+    <span class="badge ${data[1]}">
+      ${data[0]}
+    </span>
+  `;
+
+}
+
+
+function memberName(id){
+
+  return members
+    .find(x => x.id === id)
+    ?.name ||
+    "ไม่ระบุ";
+
+}
+
+
+function serviceName(id){
+
+  return services
+    .find(x => x.id === id)
+    ?.name ||
+    "ไม่ระบุ";
+
+}
+
+
+/* =========================================================
+   PAGE NAVIGATION
+========================================================= */
+
+function page(p){
+
+  document
+    .querySelectorAll("main section")
+    .forEach(
+      x =>
+        x.classList.add("hidden")
+    );
+
+  $(p)
+    .classList
+    .remove("hidden");
+
+  document
+    .querySelectorAll(".nav")
+    .forEach(
+      x =>
+        x.classList.toggle(
+          "active",
+          x.dataset.p === p
+        )
+    );
+
+  const fn = {
+
+    dashboard:dash,
+
+    members:membersPage,
+
+    services:servicesPage,
+
+    readings:readingsPage,
+
+    templates:templatesPage,
+
+    reviews:reviewsPage
+
+  }[p];
+
+  if(fn)
+    fn();
+
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+function modal(title,body){
+
+  $("mt").textContent =
+    title;
+
+  $("mb").innerHTML =
+    body;
+
+  $("modal")
+    .classList
+    .remove("hidden");
+
+}
+
+
+function closeModal(){
+
+  $("modal")
+    .classList
+    .add("hidden");
+
+}
+
+
+/* =========================================================
+   LOGIN
+========================================================= */
+
+$("loginForm")
+  .onsubmit =
+  async e => {
+
+    e.preventDefault();
+
+    const {
+      error
+    } =
+      await sb.auth.signInWithPassword({
+
+        email:
+          $("email").value,
+
+        password:
+          $("password").value
+
+      });
+
+    if(error){
+
+      $("loginErr")
+        .textContent =
+        error.message;
+
+    }
+
+  };
+
+
+sb.auth.onAuthStateChange(
+  async (_,session) => {
+
+    if(session){
+
+      $("login")
+        .classList
+        .add("hidden");
+
+      $("app")
+        .classList
+        .remove("hidden");
+
+      $("user")
+        .textContent =
+        session.user.email || "";
+
+      await load();
+
+      page("dashboard");
+
+    }
+    else{
+
+      $("app")
+        .classList
+        .add("hidden");
+
+      $("login")
+        .classList
+        .remove("hidden");
+
+    }
+
+  }
+);
+
+
+async function logout(){
+
+  await sb.auth.signOut();
+
+}
+
+
+/* =========================================================
+   LOAD DATA
+========================================================= */
+
+async function load(){
+
+  const [
+    a,
+    b,
+    c,
+    d,
+    e
+  ] =
+    await Promise.all([
+
+      sb
+        .from("members")
+        .select("*")
+        .order(
+          "created_at",
+          {ascending:false}
+        ),
+
+      sb
+        .from("services")
+        .select("*")
+        .order(
+          "created_at",
+          {ascending:false}
+        ),
+
+      sb
+        .from("readings")
+        .select("*")
+        .order(
+          "created_at",
+          {ascending:false}
+        ),
+
+      sb
+        .from("templates")
+        .select("*")
+        .order(
+          "created_at",
+          {ascending:false}
+        ),
+
+      sb
+        .from("reviews")
+        .select("*")
+        .order(
+          "review_date",
+          {ascending:false}
+        )
+
+    ]);
+
+  members =
+    a.data || [];
+
+  services =
+    b.data || [];
+
+  readings =
+    c.data || [];
+
+  templates =
+    d.data || [];
+
+  reviews =
+    e.data || [];
+
+}
+
+
+/* =========================================================
+   DASHBOARD
+========================================================= */
+
+function dash(){
+
+  const now =
+    new Date();
+
+  const month =
+    now.getMonth();
+
+  const year =
+    now.getFullYear();
+
+
+  const active =
+    readings.filter(
+      r =>
+        [
+          "pending",
+          "reading",
+          "draft"
+        ].includes(r.status)
+    ).length;
+
+
+  const sent =
+    readings.filter(
+      r =>
+        [
+          "sent",
+          "checked",
+          "closed"
+        ].includes(r.status)
+    ).length;
+
+
+  const urgent =
+    readings
+      .filter(
+        r =>
+          r.deadline_at &&
+          ![
+            "closed",
+            "cancelled",
+            "checked"
+          ].includes(r.status) &&
+          new Date(r.deadline_at)
+            <=
+          new Date(
+            Date.now()+864e5
+          )
+      )
+      .sort(
+        (a,b) =>
+          new Date(a.deadline_at) -
+          new Date(b.deadline_at)
+      );
+
+
+  const months = [];
+
+  for(
+    let i=5;
+    i>=0;
+    i--
+  ){
+
+    const d =
+      new Date(
+        year,
+        month-i,
+        1
+      );
+
+    months.push({
+
+      label:
+        d.toLocaleDateString(
+          "th-TH",
+          {month:"short"}
+        ),
+
+      n:
+        readings.filter(
+          r => {
+
+            const x =
+              new Date(
+                r.created_at
+              );
+
+            return (
+              x.getMonth() ===
+                d.getMonth() &&
+              x.getFullYear() ===
+                d.getFullYear()
+            );
+
+          }
+        ).length
+
+    });
+
+  }
+
+
+  const max =
+    Math.max(
+      1,
+      ...months.map(x=>x.n)
+    );
+
+
+  $("dashboard")
+    .innerHTML = `
+
+      <div class="hero">
+
+        <h1>
+          สวัสดีค่ะ ✦
+          วันนี้ไพ่กำลังรอเราอยู่
+        </h1>
+
+        <p>
+          จัดการงานอ่านไพ่ ลูกค้า
+          และบันทึกการเติบโตของร้าน
+          ในพื้นที่เดียว 🌷
+        </p>
+
+        <button
+          class="btn primary"
+          style="margin-top:16px"
+          onclick="newReading()"
+        >
+          ＋ สร้างงานอ่านไพ่ใหม่
+        </button>
+
+      </div>
+
+
+      <div class="stats">
+
+        <div class="stat">
+
+          <div class="stathead">
+            งานทั้งหมด
+            <span class="ico">
+              📝
+            </span>
+          </div>
+
+          <strong>
+            ${readings.length}
+          </strong>
+
+          <small>
+            งานที่บันทึกไว้
+          </small>
+
+        </div>
+
+
+        <div class="stat">
+
+          <div class="stathead">
+            กำลังดูแล
+            <span class="ico">
+              🔮
+            </span>
+          </div>
+
+          <strong>
+            ${active}
+          </strong>
+
+          <small>
+            รอเริ่ม / กำลังอ่าน / ร่าง
+          </small>
+
+        </div>
+
+
+        <div class="stat">
+
+          <div class="stathead">
+            ส่งแล้ว
+            <span class="ico">
+              💌
+            </span>
+          </div>
+
+          <strong>
+            ${sent}
+          </strong>
+
+          <small>
+            ส่ง / เช็ก / ปิดงาน
+          </small>
+
+        </div>
+
+
+        <div class="stat">
+
+          <div class="stathead">
+            ใกล้ครบกำหนด
+            <span class="ico">
+              ⏰
+            </span>
+          </div>
+
+          <strong>
+            ${urgent.length}
+          </strong>
+
+          <small>
+            ภายใน 24 ชั่วโมง
+          </small>
+
+        </div>
+
+      </div>
+
+
+      <div class="title">
+
+        <div>
+
+          <h2>
+            ✦ ภาพรวมงานอ่านไพ่
+          </h2>
+
+          <p>
+            จำนวนงาน 6 เดือนล่าสุด
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="grid2">
+
+        <div class="card chart">
+
+          <div class="bars">
+
+            ${months.map(x=>`
+
+              <div class="barcol">
+
+                <span class="barvalue">
+                  ${x.n}
+                </span>
+
+                <div
+                  class="bar"
+                  style="
+                    height:
+                    ${Math.max(
+                      4,
+                      x.n/max*175
+                    )}px
+                  "
+                ></div>
+
+                <span class="barlabel">
+                  ${x.label}
+                </span>
+
+              </div>
+
+            `).join("")}
+
+          </div>
+
+        </div>
+
+
+        <div class="card">
+
+          <div
+            class="title"
+            style="margin-top:0"
+          >
+
+            <div>
+
+              <h2>
+                💕 ภาพรวมร้าน
+              </h2>
+
+              <p>
+                ข้อมูลจาก Supabase จริง
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div class="list">
+
+            <div class="item">
+
+              <span>👥</span>
+
+              <div class="grow">
+
+                <b>
+                  สมาชิกทั้งหมด
+                </b>
+
+                <span class="muted">
+                  ${members.length} คน
+                </span>
+
+              </div>
+
+            </div>
+
+
+            <div class="item">
+
+              <span>💌</span>
+
+              <div class="grow">
+
+                <b>
+                  รีวิวที่เก็บไว้
+                </b>
+
+                <span class="muted">
+                  ${reviews.length} รีวิว
+                </span>
+
+              </div>
+
+            </div>
+
+
+            <div class="item">
+
+              <span>✨</span>
+
+              <div class="grow">
+
+                <b>
+                  บริการทั้งหมด
+                </b>
+
+                <span class="muted">
+                  ${services.length} บริการ
+                </span>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="title">
+
+        <div>
+
+          <h2>
+            ⏰ งานที่ต้องดูแล
+          </h2>
+
+          <p>
+            เรียงตาม deadline
+          </p>
+
+        </div>
+
+        <button
+          class="btn ghost small"
+          onclick="page('readings')"
+        >
+          ดูทั้งหมด →
+        </button>
+
+      </div>
+
+
+      <div class="grid2">
+
+        <div class="card">
+
+          <div class="list">
+
+            ${
+              urgent
+                .slice(0,5)
+                .map(
+                  r => `
+
+                    <div
+                      class="item"
+                      onclick="
+                        openReading('${r.id}')
+                      "
+                      style="cursor:pointer"
+                    >
+
+                      <span>
+                        🔮
+                      </span>
+
+                      <div class="grow">
+
+                        <b>
+                          ${esc(
+                            memberName(
+                              r.member_id
+                            )
+                          )}
+                        </b>
+
+                        <span class="muted">
+                          ${esc(
+                            serviceName(
+                              r.service_id
+                            )
+                          )}
+                          ·
+                          ${fmt(
+                            r.deadline_at
+                          )}
+                        </span>
+
+                      </div>
+
+                      ${badge(r.status)}
+
+                    </div>
+
+                  `
+                )
+                .join("")
+              ||
+              `
+                <div class="empty">
+                  วันนี้ยังไม่มีงานเร่งด่วน ✦
+                </div>
+              `
+            }
+
+          </div>
+
+        </div>
+
+
+        <div class="card">
+
+          <div
+            class="title"
+            style="margin-top:0"
+          >
+
+            <div>
+
+              <h2>
+                🃏 งานล่าสุด
+              </h2>
+
+              <p>
+                กลับไปทำต่อได้ทันที
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div class="list">
+
+            ${
+              readings
+                .slice(0,5)
+                .map(
+                  r => `
+
+                    <div
+                      class="item"
+                      onclick="
+                        openReading('${r.id}')
+                      "
+                      style="cursor:pointer"
+                    >
+
+                      <span>
+                        🃏
+                      </span>
+
+                      <div class="grow">
+
+                        <b>
+                          ${esc(
+                            memberName(
+                              r.member_id
+                            )
+                          )}
+                        </b>
+
+                        <span class="muted">
+                          ${esc(
+                            r.question ||
+                            serviceName(
+                              r.service_id
+                            )
+                          )}
+                        </span>
+
+                      </div>
+
+                      ${badge(r.status)}
+
+                    </div>
+
+                  `
+                )
+                .join("")
+              ||
+              `
+                <div class="empty">
+                  ยังไม่มีงาน
+                </div>
+              `
+            }
+
+          </div>
+
+        </div>
+
+      </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+   MEMBERS
+========================================================= */
+
+function membersPage(){
+
+  const q =
+    $("memberSearch")
+      ?.value || "";
+
+
+  const rows =
+    members.filter(
+      m =>
+        `
+          ${m.name}
+          ${m.nickname || ""}
+          ${m.contact_channel || ""}
+          ${m.contact_id || ""}
+        `
+        .toLowerCase()
+        .includes(
+          q.toLowerCase()
+        )
+    );
+
+
+  $("members")
+    .innerHTML = `
+
+      <div class="pagehead">
+
+        <div>
+
+          <h1>
+            💕 สมาชิก
+          </h1>
+
+          <p>
+            ประวัติลูกค้าและงานย้อนหลัง
+          </p>
+
+        </div>
+
+        <button
+          class="btn primary"
+          onclick="memberModal()"
+        >
+          ＋ เพิ่มสมาชิก
+        </button>
+
+      </div>
+
+
+      <div class="toolbar">
+
+        <input
+          id="memberSearch"
+          class="input search"
+          placeholder="
+            ค้นหาชื่อ / ช่องทาง / ID
+          "
+          value="${esc(q)}"
+          oninput="membersPage()"
+        >
+
+      </div>
+
+
+      <div class="card">
+
+        <table class="table">
+
+          <thead>
+
+            <tr>
+
+              <th>
+                สมาชิก
+              </th>
+
+              <th>
+                ช่องทาง
+              </th>
+
+              <th>
+                งาน
+              </th>
+
+              <th>
+                จัดการ
+              </th>
+
+            </tr>
+
+          </thead>
+
+
+          <tbody>
+
+            ${
+              rows
+                .map(
+                  m => `
+
+                    <tr>
+
+                      <td>
+
+                        <b>
+                          ${esc(m.name)}
+                        </b>
+
+                        <div class="muted">
+                          ${esc(
+                            m.nickname || ""
+                          )}
+                        </div>
+
+                      </td>
+
+
+                      <td>
+
+                        ${esc(
+                          m.contact_channel ||
+                          "-"
+                        )}
+
+                        <div class="muted">
+                          ${esc(
+                            m.contact_id ||
+                            ""
+                          )}
+                        </div>
+
+                      </td>
+
+
+                      <td>
+                        ${
+                          readings.filter(
+                            r =>
+                              r.member_id ===
+                              m.id
+                          ).length
+                        }
+                      </td>
+
+
+                      <td>
+
+                        <div class="actions">
+
+                          <button
+                            class="btn soft small"
+                            onclick="
+                              historyMember(
+                                '${m.id}'
+                              )
+                            "
+                          >
+                            ประวัติ
+                          </button>
+
+                          <button
+                            class="btn ghost small"
+                            onclick="
+                              memberModal(
+                                '${m.id}'
+                              )
+                            "
+                          >
+                            แก้ไข
+                          </button>
+
+                          <button
+                            class="btn danger small"
+                            onclick="
+                              delMember(
+                                '${m.id}'
+                              )
+                            "
+                          >
+                            ลบ
+                          </button>
+
+                        </div>
+
+                      </td>
+
+                    </tr>
+
+                  `
+                )
+                .join("")
+              ||
+              `
+                <tr>
+
+                  <td colspan="4">
+
+                    <div class="empty">
+                      ยังไม่มีสมาชิก 🌷
+                    </div>
+
+                  </td>
+
+                </tr>
+              `
+            }
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    `;
+
+}
+
+
+function memberModal(id){
+
+  const m =
+    id
+      ? members.find(
+          x => x.id === id
+        )
+      : {};
+
+
+  modal(
+
+    id
+      ? "แก้ไขสมาชิก"
+      : "＋ เพิ่มสมาชิก",
+
+    `
+
+      <div class="form">
+
+        <div class="field">
+
+          <label>
+            ชื่อ *
+          </label>
+
+          <input
+            id="mn"
+            class="input"
+            value="${esc(
+              m?.name || ""
+            )}"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            ชื่อเล่น
+          </label>
+
+          <input
+            id="mk"
+            class="input"
+            value="${esc(
+              m?.nickname || ""
+            )}"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            ช่องทาง
+          </label>
+
+          <input
+            id="mc"
+            class="input"
+            placeholder="
+              LINE / FB / IG / TikTok
+            "
+            value="${esc(
+              m?.contact_channel || ""
+            )}"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            ID ติดต่อ
+          </label>
+
+          <input
+            id="mi"
+            class="input"
+            value="${esc(
+              m?.contact_id || ""
+            )}"
+          >
+
+        </div>
+
+
+        <div class="field full">
+
+          <label>
+            หมายเหตุ
+          </label>
+
+          <textarea
+            id="mm"
+            class="textarea"
+          >${esc(
+            m?.note || ""
+          )}</textarea>
+
+        </div>
+
+      </div>
+
+
+      <button
+        class="btn primary"
+        style="margin-top:13px"
+        onclick="
+          saveMember('${id || ""}')
+        "
+      >
+        บันทึกสมาชิก ✦
+      </button>
+
+    `
+
+  );
+
+}
+
+
+async function saveMember(id){
+
+  const p = {
+
+    name:
+      $("mn")
+        .value
+        .trim(),
+
+    nickname:
+      $("mk")
+        .value
+        .trim(),
+
+    contact_channel:
+      $("mc")
+        .value
+        .trim(),
+
+    contact_id:
+      $("mi")
+        .value
+        .trim(),
+
+    note:
+      $("mm")
+        .value
+        .trim()
+
+  };
+
+
+  if(!p.name)
+    return toast(
+      "กรุณาใส่ชื่อ"
+    );
+
+
+  const q =
+    id
+      ? sb
+          .from("members")
+          .update(p)
+          .eq("id",id)
+      : sb
+          .from("members")
+          .insert(p);
+
+
+  const {
+    error
+  } = await q;
+
+
+  if(error)
+    return toast(
+      error.message
+    );
+
+
+  closeModal();
+
+  await load();
+
+  membersPage();
+
+  toast(
+    "บันทึกแล้ว 💕"
+  );
+
+}
+
+
+async function delMember(id){
+
+  if(
+    !confirm(
+      "ลบสมาชิกนี้หรือไม่?"
+    )
+  )
+    return;
+
+
+  await sb
+    .from("members")
+    .delete()
+    .eq("id",id);
+
+
+  await load();
+
+  membersPage();
+
+}
+
+
+function historyMember(id){
+
+  const m =
+    members.find(
+      x => x.id === id
+    );
+
+
+  const rs =
+    readings.filter(
+      r =>
+        r.member_id === id
+    );
+
+
+  modal(
+
+    `💕 ประวัติ ${
+      m?.name || ""
+    }`,
+
+    `
+
+      <div class="list">
+
+        ${
+          rs
+            .map(
+              r => `
+
+                <div
+                  class="item"
+                  onclick="
+                    closeModal();
+                    openReading('${r.id}')
+                  "
+                  style="cursor:pointer"
+                >
+
+                  <span>
+                    🃏
+                  </span>
+
+                  <div class="grow">
+
+                    <b>
+                      ${esc(
+                        r.question ||
+                        serviceName(
+                          r.service_id
+                        )
+                      )}
+                    </b>
+
+                    <span class="muted">
+                      ${fmt(
+                        r.created_at
+                      )}
+                    </span>
+
+                  </div>
+
+                  ${badge(r.status)}
+
+                </div>
+
+              `
+            )
+            .join("")
+          ||
+          `
+            <div class="empty">
+              ยังไม่มีงาน
+            </div>
+          `
+        }
+
+      </div>
+
+    `
+
+  );
+
+}
+
+
+/* =========================================================
+   SERVICES
+========================================================= */
+
+async function servicesPage(){
+
+  const enriched =
+    await Promise.all(
+
+      services.map(
+        async s => {
+
+          const {
+            data
+          } =
+            await sb
+              .from(
+                "service_positions"
+              )
+              .select("*")
+              .eq(
+                "service_id",
+                s.id
+              )
+              .order(
+                "position_number"
+              );
+
+          return {
+
+            ...s,
+
+            pos:
+              data || []
+
+          };
+
+        }
+      )
+
+    );
+
+
+  $("services")
+    .innerHTML = `
+
+      <div class="pagehead">
+
+        <div>
+
+          <h1>
+            ✨ บริการ
+          </h1>
+
+          <p>
+            ตั้งค่าจำนวนไพ่ ราคา เวลา
+            และตำแหน่ง
+          </p>
+
+        </div>
+
+        <button
+          class="btn primary"
+          onclick="serviceModal()"
+        >
+          ＋ เพิ่มบริการ
+        </button>
+
+      </div>
+
+
+      <div class="grid3">
+
+        ${
+          enriched
+            .map(
+              s => `
+
+                <div class="card">
+
+                  <span
+                    class="badge purple"
+                  >
+                    ${
+                      s.active
+                        ? "เปิดใช้งาน"
+                        : "ปิด"
+                    }
+                  </span>
+
+
+                  <h2
+                    style="font-size:18px"
+                  >
+                    ${esc(s.name)}
+                  </h2>
+
+
+                  <p class="muted">
+                    ${esc(
+                      s.description || ""
+                    )}
+                  </p>
+
+
+                  <b>
+                    ${
+                      s.price != null
+                        ? Number(
+                            s.price
+                          )
+                          .toLocaleString(
+                            "th-TH"
+                          ) +
+                          " บาท"
+                        : "ไม่ระบุราคา"
+                    }
+                  </b>
+
+
+                  <div
+                    class="muted"
+                    style="margin-top:5px"
+                  >
+                    ${
+                      s.pos.length ||
+                      s.card_count ||
+                      0
+                    }
+                    ใบ ·
+                    ${
+                      s.delivery_hours ||
+                      24
+                    }
+                    ชม.
+                  </div>
+
+
+                  <div
+                    class="actions"
+                    style="margin-top:13px"
+                  >
+
+                    <button
+                      class="btn soft small"
+                      onclick="
+                        serviceModal(
+                          '${s.id}'
+                        )
+                      "
+                    >
+                      แก้ไข
+                    </button>
+
+
+                    <button
+                      class="btn lav small"
+                      onclick="
+                        positions(
+                          '${s.id}'
+                        )
+                      "
+                    >
+                      ตำแหน่งไพ่
+                    </button>
+
+
+                    <button
+                      class="btn danger small"
+                      onclick="
+                        delService(
+                          '${s.id}'
+                        )
+                      "
+                    >
+                      ลบ
+                    </button>
+
+                  </div>
+
+                </div>
+
+              `
+            )
+            .join("")
+          ||
+          `
+            <div class="card empty">
+              ยังไม่มีบริการ ✦
+            </div>
+          `
+        }
+
+      </div>
+
+    `;
+
+}
+
+
+function serviceModal(id){
+
+  const s =
+    id
+      ? services.find(
+          x => x.id === id
+        )
+      : {};
+
+
+  modal(
+
+    id
+      ? "แก้ไขบริการ"
+      : "＋ เพิ่มบริการ",
+
+    `
+
+      <div class="form">
+
+        <div class="field">
+
+          <label>
+            ชื่อบริการ *
+          </label>
+
+          <input
+            id="sv"
+            class="input"
+            value="${esc(
+              s?.name || ""
+            )}"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            ราคา
+          </label>
+
+          <input
+            id="sp"
+            class="input"
+            type="number"
+            value="${
+              s?.price ?? ""
+            }"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            จำนวนไพ่
+          </label>
+
+          <input
+            id="sc"
+            class="input"
+            type="number"
+            value="${
+              s?.card_count ?? 3
+            }"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            ส่งภายใน (ชั่วโมง)
+          </label>
+
+          <input
+            id="sh"
+            class="input"
+            type="number"
+            value="${
+              s?.delivery_hours ?? 24
+            }"
+          >
+
+        </div>
+
+
+        <div class="field full">
+
+          <label>
+            รายละเอียด
+          </label>
+
+          <textarea
+            id="sd"
+            class="textarea"
+          >${esc(
+            s?.description || ""
+          )}</textarea>
+
+        </div>
+
+      </div>
+
+
+      <button
+        class="btn primary"
+        style="margin-top:13px"
+        onclick="
+          saveService(
+            '${id || ""}'
+          )
+        "
+      >
+        บันทึกบริการ ✨
+      </button>
+
+    `
+
+  );
+
+}
+
+
+async function saveService(id){
+
+  const p = {
+
+    name:
+      $("sv")
+        .value
+        .trim(),
+
+    price:
+      $("sp").value
+        ? Number(
+            $("sp").value
+          )
+        : null,
+
+    card_count:
+      Number(
+        $("sc").value
+      ) || 3,
+
+    delivery_hours:
+      Number(
+        $("sh").value
+      ) || 24,
+
+    description:
+      $("sd")
+        .value
+        .trim(),
+
+    active:true
+
+  };
+
+
+  if(!p.name)
+    return toast(
+      "กรุณาใส่ชื่อบริการ"
+    );
+
+
+  let data,
+      error;
+
+
+  if(id){
+
+    ({
+      error
+    } =
+      await sb
+        .from("services")
+        .update(p)
+        .eq("id",id));
+
+  }
+  else{
+
+    ({
+      data,
+      error
+    } =
+      await sb
+        .from("services")
+        .insert(p)
+        .select()
+        .single());
+
+  }
+
+
+  if(error)
+    return toast(
+      error.message
+    );
+
+
+  if(!id && data){
+
+    for(
+      let i=1;
+      i<=p.card_count;
+      i++
+    ){
+
+      await sb
+        .from("service_positions")
+        .insert({
+
+          service_id:
+            data.id,
+
+          position_number:
+            i,
+
+          position_name:
+            `ตำแหน่งที่ ${i}`
+
+        });
+
+    }
+
+  }
+
+
+  closeModal();
+
+  await load();
+
+  servicesPage();
+
+  toast(
+    "บันทึกบริการแล้ว ✨"
+  );
+
+}
+
+
+async function delService(id){
+
+  if(
+    !confirm(
+      "ลบบริการนี้หรือไม่?"
+    )
+  )
+    return;
+
+
+  await sb
+    .from("services")
+    .delete()
+    .eq("id",id);
+
+
+  await load();
+
+  servicesPage();
+
+}
+
+
+/* =========================================================
+   SERVICE POSITIONS
+========================================================= */
+
+async function positions(id){
+
+  let {
+    data
+  } =
+    await sb
+      .from("service_positions")
+      .select("*")
+      .eq("service_id",id)
+      .order(
+        "position_number"
+      );
+
+
+  data =
+    data || [];
+
+
+  modal(
+
+    "ตำแหน่งไพ่",
+
+    `
+
+      <div id="poslist">
+
+        ${
+          data
+            .map(
+              p => `
+
+                <div
+                  class="item"
+                >
+
+                  <input
+                    class="input pn"
+                    data-id="${p.id}"
+                    style="max-width:65px"
+                    type="number"
+                    value="${
+                      p.position_number
+                    }"
+                  >
+
+                  <input
+                    class="input px"
+                    data-id="${p.id}"
+                    value="${esc(
+                      p.position_name
+                    )}"
+                  >
+
+                  <button
+                    class="btn danger small"
+                    onclick="
+                      delPos(
+                        '${p.id}',
+                        '${id}'
+                      )
+                    "
+                  >
+                    ลบ
+                  </button>
+
+                </div>
+
+              `
+            )
+            .join("")
+        }
+
+      </div>
+
+
+      <button
+        class="btn soft"
+        onclick="
+          addPos('${id}')
+        "
+      >
+        ＋ เพิ่มตำแหน่ง
+      </button>
+
+      <button
+        class="btn primary"
+        onclick="
+          savePos('${id}')
+        "
+      >
+        บันทึก
+      </button>
+
+    `
+
+  );
+
+}
+
+
+async function addPos(id){
+
+  const {
+    data
+  } =
+    await sb
+      .from("service_positions")
+      .select(
+        "position_number"
+      )
+      .eq(
+        "service_id",
+        id
+      )
+      .order(
+        "position_number",
+        {
+          ascending:false
+        }
+      )
+      .limit(1);
+
+
+  const n =
+    (
+      data?.[0]
+        ?.position_number ||
+      0
+    ) + 1;
+
+
+  await sb
+    .from("service_positions")
+    .insert({
+
+      service_id:id,
+
+      position_number:n,
+
+      position_name:
+        `ตำแหน่งที่ ${n}`
+
+    });
+
+
+  positions(id);
+
+}
+
+
+async function delPos(
+  pid,
+  sid
+){
+
+  await sb
+    .from("service_positions")
+    .delete()
+    .eq("id",pid);
+
+  positions(sid);
+
+}
+
+
+async function savePos(sid){
+
+  for(
+    const x of
+    document.querySelectorAll(
+      ".px"
+    )
+  ){
+
+    const number =
+      document.querySelector(
+        `.pn[data-id="${x.dataset.id}"]`
+      );
+
+
+    await sb
+      .from("service_positions")
+      .update({
+
+        position_name:
+          x.value,
+
+        position_number:
+          Number(
+            number.value
+          ) || 1
+
+      })
+      .eq(
+        "id",
+        x.dataset.id
+      );
+
+  }
+
+
+  closeModal();
+
+  servicesPage();
+
+  toast(
+    "บันทึกตำแหน่งแล้ว ✨"
+  );
+
+}
+
+
+/* =========================================================
+   READINGS LIST
+========================================================= */
+
+function readingsPage(){
+
+  const q =
+    $("rq")
+      ?.value || "";
+
+
+  const rs =
+    readings.filter(
+      r =>
+        `
+          ${memberName(
+            r.member_id
+          )}
+
+          ${serviceName(
+            r.service_id
+          )}
+
+          ${r.question || ""}
+        `
+        .toLowerCase()
+        .includes(
+          q.toLowerCase()
+        )
+    );
+
+
+  $("readings")
+    .innerHTML = `
+
+      <div class="pagehead">
+
+        <div>
+
+          <h1>
+            🃏 งานอ่านไพ่
+          </h1>
+
+          <p>
+            ทำงานต่อ บันทึก
+            และพิมพ์ส่งลูกค้า
+          </p>
+
+        </div>
+
+        <button
+          class="btn primary"
+          onclick="newReading()"
+        >
+          ＋ เพิ่มงาน
+        </button>
+
+      </div>
+
+
+      <div class="toolbar">
+
+        <input
+          id="rq"
+          class="input search"
+          placeholder="
+            ค้นหาสมาชิก / บริการ / คำถาม
+          "
+          value="${esc(q)}"
+          oninput="readingsPage()"
+        >
+
+      </div>
+
+
+      <div class="card">
+
+        <table class="table">
+
+          <thead>
+
+            <tr>
+
+              <th>
+                สมาชิก
+              </th>
+
+              <th>
+                บริการ / คำถาม
+              </th>
+
+              <th>
+                กำหนดส่ง
+              </th>
+
+              <th>
+                สถานะ
+              </th>
+
+              <th>
+                จัดการ
+              </th>
+
+            </tr>
+
+          </thead>
+
+
+          <tbody>
+
+            ${
+              rs
+                .map(
+                  r => `
+
+                    <tr>
+
+                      <td>
+
+                        <b>
+                          ${esc(
+                            memberName(
+                              r.member_id
+                            )
+                          )}
+                        </b>
+
+                        <div class="muted">
+                          ${fmt(
+                            r.created_at
+                          )}
+                        </div>
+
+                      </td>
+
+
+                      <td>
+
+                        <b>
+                          ${esc(
+                            serviceName(
+                              r.service_id
+                            )
+                          )}
+                        </b>
+
+                        <div class="muted">
+                          ${esc(
+                            r.question || ""
+                          )}
+                        </div>
+
+                      </td>
+
+
+                      <td>
+                        ${deadline(r)}
+                      </td>
+
+
+                      <td>
+                        ${badge(r.status)}
+                      </td>
+
+
+                      <td>
+
+                        <div class="actions">
+
+                          <button
+                            class="btn soft small"
+                            onclick="
+                              openReading(
+                                '${r.id}'
+                              )
+                            "
+                          >
+                            ทำงานต่อ
+                          </button>
+
+                          <button
+                            class="btn lav small"
+                            onclick="
+                              cloneReading(
+                                '${r.id}'
+                              )
+                            "
+                          >
+                            คัดลอก
+                          </button>
+
+                          <button
+                            class="btn ghost small"
+                            onclick="
+                              printReading(
+                                '${r.id}'
+                              )
+                            "
+                          >
+                            พิมพ์
+                          </button>
+
+                        </div>
+
+                      </td>
+
+                    </tr>
+
+                  `
+                )
+                .join("")
+              ||
+              `
+                <tr>
+
+                  <td colspan="5">
+
+                    <div class="empty">
+                      ยังไม่มีงานอ่านไพ่ ✦
+                    </div>
+
+                  </td>
+
+                </tr>
+              `
+            }
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    `;
+
+}
+
+
+function deadline(r){
+
+  if(!r.deadline_at){
+
+    return `
+      <span class="muted">
+        ไม่กำหนด
+      </span>
+    `;
+
+  }
+
+
+  if(
+    [
+      "closed",
+      "cancelled",
+      "checked"
+    ].includes(
+      r.status
+    )
+  ){
+
+    return fmt(
+      r.deadline_at
+    );
+
+  }
+
+
+  const d =
+    new Date(
+      r.deadline_at
+    ) -
+    Date.now();
+
+
+  return `
+
+    <span
+      class="
+        badge
+        ${
+          d < 0
+            ? "red"
+            : d < 864e5
+              ? "yellow"
+              : "green"
+        }
+      "
+    >
+
+      ${
+        d < 0
+          ? "เกินกำหนด"
+          : fmt(
+              r.deadline_at
+            )
+      }
+
+    </span>
+
+  `;
+
+}
+
+
+/* =========================================================
+   NEW READING
+========================================================= */
+
+async function newReading(){
+
+  const s =
+    services[0];
+
+
+  current = {
+
+    id:null,
+
+    member_id:
+      members[0]?.id ||
+      null,
+
+    service_id:
+      s?.id ||
+      null,
+
+    question:"",
+
+    started_at:
+      new Date()
+        .toISOString(),
+
+    deadline_at:
+      new Date(
+        Date.now() +
+        (s?.delivery_hours || 24)
+        * 36e5
+      ).toISOString(),
+
+    status:
+      "pending",
+
+    overall_reading:"",
+
+    private_note:""
+
+  };
+
+
+  cards = [];
+
+  sections = [];
+
+
+  if(s){
+
+    for(
+      let i=1;
+      i<=s.card_count;
+      i++
+    ){
+
+      cards.push({
+
+        position_number:i,
+
+        position_name:
+          `ตำแหน่งที่ ${i}`,
+
+        card_id:
+          CARDS[i-1]?.[0] ||
+          CARDS[0][0],
+
+        orientation:
+          "upright",
+
+        interpretation:""
+
+      });
+
+    }
+
+  }
+
+
+  editor();
+
+  page("editor");
+
+}
+
+
+/* =========================================================
+   OPEN READING
+========================================================= */
+
+async function openReading(id){
+
+  current =
+    readings.find(
+      x => x.id === id
+    );
+
+
+  if(!current)
+    return;
+
+
+  const [
+    a,
+    b
+  ] =
+    await Promise.all([
+
+      sb
+        .from("reading_cards")
+        .select("*")
+        .eq(
+          "reading_id",
+          id
+        )
+        .order(
+          "position_number"
+        ),
+
+      sb
+        .from("reading_sections")
+        .select("*")
+        .eq(
+          "reading_id",
+          id
+        )
+        .order(
+          "sort_order"
+        )
+
+    ]);
+
+
+  cards =
+    a.data || [];
+
+  sections =
+    b.data || [];
+
+
+  editor();
+
+  page("editor");
+
+}
+
+
+/* =========================================================
+   EDITOR
+========================================================= */
+
+function editor(){
+
+  $("editor")
+    .innerHTML = `
+
+      <div class="pagehead">
+
+        <div>
+
+          <h1>
+            🔮
+            ${
+              current.id
+                ? "ทำงานอ่านไพ่"
+                : "สร้างงานใหม่"
+            }
+          </h1>
+
+          <p>
+            ระบบ autosave จะบันทึก
+            อัตโนมัติหลังหยุดพิมพ์
+            ประมาณ 2 วินาที
+          </p>
+
+        </div>
+
+
+        <button
+          class="btn ghost"
+          onclick="
+            page('readings')
+          "
+        >
+          ← กลับ
+        </button>
+
+      </div>
+
+
+      <div class="card">
+
+        <div class="form">
+
+          <div class="field">
+
+            <label>
+              สมาชิก
+            </label>
+
+            <select
+              id="em"
+              class="select"
+              onchange="auto()"
+            >
+
+              <option value="">
+                — ไม่ระบุ —
+              </option>
+
+              ${
+                members
+                  .map(
+                    m => `
+
+                      <option
+                        value="${m.id}"
+                        ${
+                          m.id ===
+                          current.member_id
+                            ? "selected"
+                            : ""
+                        }
+                      >
+                        ${esc(m.name)}
+                      </option>
+
+                    `
+                  )
+                  .join("")
+              }
+
+            </select>
+
+          </div>
+
+
+          <div class="field">
+
+            <label>
+              บริการ
+            </label>
+
+            <select
+              id="es"
+              class="select"
+              onchange="
+                serviceChange()
+              "
+            >
+
+              <option value="">
+                — เลือก —
+              </option>
+
+              ${
+                services
+                  .map(
+                    s => `
+
+                      <option
+                        value="${s.id}"
+                        ${
+                          s.id ===
+                          current.service_id
+                            ? "selected"
+                            : ""
+                        }
+                      >
+                        ${esc(s.name)}
+                      </option>
+
+                    `
+                  )
+                  .join("")
+              }
+
+            </select>
+
+          </div>
+
+
+          <div class="field full">
+
+            <label>
+              คำถามของลูกค้า
+            </label>
+
+            <textarea
+              id="eq"
+              class="textarea"
+              oninput="auto()"
+            >${esc(
+              current.question
+            )}</textarea>
+
+          </div>
+
+
+          <div class="field">
+
+            <label>
+              เริ่มงาน
+            </label>
+
+            <input
+              id="est"
+              class="input"
+              type="datetime-local"
+              value="${dt(
+                current.started_at
+              )}"
+              onchange="auto()"
+            >
+
+          </div>
+
+
+          <div class="field">
+
+            <label>
+              กำหนดส่ง
+            </label>
+
+            <input
+              id="edl"
+              class="input"
+              type="datetime-local"
+              value="${dt(
+                current.deadline_at
+              )}"
+              onchange="auto()"
+            >
+
+          </div>
+
+
+          <div class="field">
+
+            <label>
+              สถานะ
+            </label>
+
+            <select
+              id="ets"
+              class="select"
+              onchange="auto()"
+            >
+
+              ${
+                Object.entries(
+                  STATUS
+                )
+                .map(
+                  ([k,v]) => `
+
+                    <option
+                      value="${k}"
+                      ${
+                        k ===
+                        current.status
+                          ? "selected"
+                          : ""
+                      }
+                    >
+                      ${v[0]}
+                    </option>
+
+                  `
+                )
+                .join("")
+              }
+
+            </select>
+
+          </div>
+
+
+          <div class="field">
+
+            <label>
+              บันทึกส่วนตัว
+            </label>
+
+            <input
+              id="ep"
+              class="input"
+              value="${esc(
+                current.private_note ||
+                ""
+              )}"
+              oninput="auto()"
+            >
+
+          </div>
+
+        </div>
+
+
+        <div
+          style="
+            display:flex;
+            gap:8px;
+            align-items:center;
+            flex-wrap:wrap;
+            margin-top:13px
+          "
+        >
+
+          <button
+            class="btn soft"
+            onclick="addCard()"
+          >
+            ＋ เพิ่มตำแหน่งไพ่
+          </button>
+
+
+          <button
+            class="btn lav"
+            onclick="addSection()"
+          >
+            ＋ เพิ่มข้อความ
+          </button>
+
+
+          <button
+            class="btn ghost"
+            onclick="pickTemplate()"
+          >
+            ＋ แทรก Template
+          </button>
+
+
+          <button
+            class="btn ghost"
+            onclick="
+              current.id &&
+              cloneReading(current.id)
+            "
+          >
+            🔁 สร้างงานจากงานนี้
+          </button>
+
+
+          <span class="save">
+
+            <i
+              id="sdot"
+              class="dot"
+            ></i>
+
+            <span id="stxt">
+              ยังไม่มีการเปลี่ยนแปลง
+            </span>
+
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <div class="title">
+
+        <div>
+
+          <h2>
+            🃏 ไพ่ที่เปิด
+          </h2>
+
+          <p>
+            เลือกไพ่และระบุตรง / กลับหัว
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div id="cardedit"></div>
+
+
+      <div class="title">
+
+        <div>
+
+          <h2>
+            🌙 ภาพรวมการอ่าน
+          </h2>
+
+          <p>
+            ข้อความหลักสำหรับส่งลูกค้า
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="card">
+
+        <textarea
+          id="eo"
+          class="textarea"
+          style="min-height:180px"
+          oninput="auto()"
+        >${esc(
+          current.overall_reading ||
+          ""
+        )}</textarea>
+
+      </div>
+
+
+      <div class="title">
+
+        <div>
+
+          <h2>
+            ✦ ข้อความเพิ่มเติม
+          </h2>
+
+          <p>
+            คำแนะนำ ข้อควรระวัง
+            หรือปิดท้าย
+          </p>
+
+        </div>
+
+
+        <button
+          class="btn soft small"
+          onclick="addSection()"
+        >
+          ＋ เพิ่มข้อความ
+        </button>
+
+      </div>
+
+
+      <div id="secedit"></div>
+
+
+      <div
+        style="
+          display:flex;
+          gap:8px;
+          flex-wrap:wrap;
+          margin-top:14px
+        "
+      >
+
+        <button
+          class="btn primary"
+          onclick="save(true)"
+        >
+          💾 บันทึกงาน
+        </button>
+
+
+        <button
+          class="btn lav"
+          onclick="printCurrent()"
+        >
+          🖨️ พิมพ์ / Save PDF
+        </button>
+
+
+        <button
+          class="btn danger"
+          onclick="delCurrent()"
+        >
+          ลบงาน
+        </button>
+
+      </div>
+
+    `;
+
+
+  renderCards();
+
+  renderSections();
+
+}
+
+
+/* =========================================================
+   CARD EDITOR
+========================================================= */
+
+function renderCards(){
+
+  $("cardedit")
+    .innerHTML =
+
+      cards
+        .map(
+          (c,i) => `
+
+            <div class="cardrow">
+
+              <span
+                class="badge purple"
+              >
+                #${i+1}
+              </span>
+
+
+              <div>
+
+                <select
+                  class="select"
+                  onchange="
+                    cards[${i}]
+                      .card_id =
+                      this.value;
+
+                    auto();
+                  "
+                >
+
+                  ${
+                    CARDS
+                      .map(
+                        x => `
+
+                          <option
+                            value="${x[0]}"
+                            ${
+                              x[0] ===
+                              c.card_id
+                                ? "selected"
+                                : ""
+                            }
+                          >
+                            ${esc(x[1])}
+                          </option>
+
+                        `
+                      )
+                      .join("")
+                  }
+
+                </select>
+
+
+                <input
+                  class="input"
+                  style="margin-top:6px"
+                  value="${esc(
+                    c.position_name ||
+                    ""
+                  )}"
+                  placeholder="
+                    ชื่อตำแหน่ง
+                  "
+                  oninput="
+                    cards[${i}]
+                      .position_name =
+                      this.value;
+
+                    auto();
+                  "
+                >
+
+              </div>
+
+
+              <select
+                class="select"
+                onchange="
+                  cards[${i}]
+                    .orientation =
+                    this.value;
+
+                  auto();
+                "
+              >
+
+                <option
+                  value="upright"
+                  ${
+                    c.orientation !==
+                    "reversed"
+                      ? "selected"
+                      : ""
+                  }
+                >
+                  ↑ ตรง
+                </option>
+
+                <option
+                  value="reversed"
+                  ${
+                    c.orientation ===
+                    "reversed"
+                      ? "selected"
+                      : ""
+                  }
+                >
+                  ↓ กลับหัว
+                </option>
+
+              </select>
+
+
+              <div class="interpret">
+
+                <textarea
+                  class="textarea"
+                  placeholder="
+                    คำตีความไพ่ใบนี้
+                  "
+                  oninput="
+                    cards[${i}]
+                      .interpretation =
+                      this.value;
+
+                    auto();
+                  "
+                >${esc(
+                  c.interpretation ||
+                  ""
+                )}</textarea>
+
+              </div>
+
+
+              <button
+                class="btn danger small"
+                onclick="
+                  cards.splice(${i},1);
+
+                  cards.forEach(
+                    (x,j) =>
+                      x.position_number =
+                      j+1
+                  );
+
+                  renderCards();
+
+                  auto();
+                "
+              >
+                ลบ
+              </button>
+
+            </div>
+
+          `
+        )
+        .join("")
+      ||
+
+      `
+
+        <div class="card empty">
+          ยังไม่มีไพ่
+          กด ＋ เพิ่มตำแหน่งไพ่ 🃏
+        </div>
+
+      `;
+
+}
+
+
+function addCard(){
+
+  const i =
+    cards.length + 1;
+
+
+  cards.push({
+
+    position_number:i,
+
+    position_name:
+      `ตำแหน่งที่ ${i}`,
+
+    card_id:
+      CARDS[i-1]?.[0] ||
+      CARDS[0][0],
+
+    orientation:
+      "upright",
+
+    interpretation:""
+
+  });
+
+
+  renderCards();
+
+  auto();
+
+}
+
+
+/* =========================================================
+   SECTIONS
+========================================================= */
+
+function renderSections(){
+
+  $("secedit")
+    .innerHTML =
+
+      sections
+        .map(
+          (s,i) => `
+
+            <div
+              class="sectionrow"
+            >
+
+              <input
+                class="input"
+                value="${esc(
+                  s.title
+                )}"
+                placeholder="
+                  หัวข้อ
+                "
+                oninput="
+                  sections[${i}]
+                    .title =
+                    this.value;
+
+                  auto();
+                "
+              >
+
+
+              <textarea
+                class="textarea"
+                placeholder="
+                  ข้อความ
+                "
+                oninput="
+                  sections[${i}]
+                    .content =
+                    this.value;
+
+                  auto();
+                "
+              >${esc(
+                s.content || ""
+              )}</textarea>
+
+
+              <button
+                class="btn danger small"
+                onclick="
+                  sections.splice(${i},1);
+
+                  renderSections();
+
+                  auto();
+                "
+              >
+                ลบ
+              </button>
+
+            </div>
+
+          `
+        )
+        .join("")
+      ||
+
+      `
+
+        <div class="card empty">
+          ยังไม่มีข้อความเพิ่มเติม
+        </div>
+
+      `;
+
+}
+
+
+function addSection(){
+
+  sections.push({
+
+    title:
+      "คำแนะนำ",
+
+    content:"",
+
+    sort_order:
+      sections.length
+
+  });
+
+
+  renderSections();
+
+  auto();
+
+}
+
+
+/* =========================================================
+   SERVICE CHANGE
+========================================================= */
+
+function serviceChange(){
+
+  current.service_id =
+    $("es").value;
+
+
+  const s =
+    services.find(
+      x =>
+        x.id ===
+        current.service_id
+    );
+
+
+  if(
+    s &&
+    !current.id
+  ){
+
+    cards = [];
+
+
+    for(
+      let i=1;
+      i<=s.card_count;
+      i++
+    ){
+
+      cards.push({
+
+        position_number:i,
+
+        position_name:
+          `ตำแหน่งที่ ${i}`,
+
+        card_id:
+          CARDS[i-1]?.[0] ||
+          CARDS[0][0],
+
+        orientation:
+          "upright",
+
+        interpretation:""
+
+      });
+
+    }
+
+
+    renderCards();
+
+  }
+
+
+  if(s){
+
+    $("edl").value =
+      dt(
+        new Date(
+          Date.now() +
+          (s.delivery_hours || 24)
+          * 36e5
+        )
+      );
+
+  }
+
+
+  auto();
+
+}
+
+
+/* =========================================================
+   AUTOSAVE
+========================================================= */
+
+function auto(){
+
+  if(
+    $("sdot")
+  )
+    $("sdot")
+      .classList
+      .add("saving");
+
+
+  if(
+    $("stxt")
+  )
+    $("stxt")
+      .textContent =
+      "กำลังรอบันทึก…";
+
+
+  clearTimeout(timer);
+
+
+  timer =
+    setTimeout(
+      () => save(false),
+      1800
+    );
+
+}
+
+
+/* =========================================================
+   SAVE READING
+========================================================= */
+
+async function save(
+  manual=false
+){
+
+  const p = {
+
+    member_id:
+      $("em")
+        ?.value ||
+      null,
+
+    service_id:
+      $("es")
+        ?.value ||
+      null,
+
+    question:
+      $("eq")
+        ?.value ||
+      "",
+
+    started_at:
+      $("est")
+        ?.value
+        ? new Date(
+            $("est").value
+          ).toISOString()
+        : new Date()
+            .toISOString(),
+
+    deadline_at:
+      $("edl")
+        ?.value
+        ? new Date(
+            $("edl").value
+          ).toISOString()
+        : null,
+
+    status:
+      $("ets")
+        ?.value ||
+      "pending",
+
+    overall_reading:
+      $("eo")
+        ?.value ||
+      "",
+
+    private_note:
+      $("ep")
+        ?.value ||
+      ""
+
+  };
+
+
+  let rid =
+    current.id;
+
+  let error,
+      data;
+
+
+  if(rid){
+
+    ({
+      error
+    } =
+      await sb
+        .from("readings")
+        .update(p)
+        .eq(
+          "id",
+          rid
+        ));
+
+  }
+  else{
+
+    ({
+      data,
+      error
+    } =
+      await sb
+        .from("readings")
+        .insert(p)
+        .select()
+        .single());
+
+
+    if(data){
+
+      rid =
+        data.id;
+
+      current = {
+
+        ...current,
+
+        ...data,
+
+        id:rid
+
+      };
+
+    }
+
+  }
+
+
+  if(error){
+
+    toast(
+      error.message
+    );
+
+    return;
+
+  }
+
+
+  if(!rid)
+    return;
+
+
+  await saveCards(rid);
+
+  await saveSections(rid);
+
+
+  await load();
+
+
+  current = {
+
+    ...readings.find(
+      x => x.id === rid
+    ),
+
+    ...p,
+
+    id:rid
+
+  };
+
+
+  $("sdot")
+    ?.classList
+    .remove("saving");
+
+
+  $("sdot")
+    ?.classList
+    .add("saved");
+
+
+  if($("stxt")){
+
+    $("stxt")
+      .textContent =
+      "บันทึกแล้ว · " +
+      new Date()
+        .toLocaleTimeString(
+          "th-TH",
+          {
+            hour:"2-digit",
+            minute:"2-digit"
+          }
+        );
+
+  }
+
+
+  if(manual)
+    toast(
+      "บันทึกงานแล้ว 💾"
+    );
+
+}
+
+
+/* =========================================================
+   SAVE CARDS
+========================================================= */
+
+async function saveCards(rid){
+
+  const {
+    data:old
+  } =
+    await sb
+      .from("reading_cards")
+      .select("id")
+      .eq(
+        "reading_id",
+        rid
+      );
+
+
+  const keep =
+    cards
+      .filter(
+        x => x.id
+      )
+      .map(
+        x => x.id
+      );
+
+
+  const rm =
+    (old || [])
+      .map(
+        x => x.id
+      )
+      .filter(
+        id =>
+          !keep.includes(id)
+      );
+
+
+  if(rm.length){
+
+    await sb
+      .from("reading_cards")
+      .delete()
+      .in(
+        "id",
+        rm
+      );
+
+  }
+
+
+  for(
+    let i=0;
+    i<cards.length;
+    i++
+  ){
+
+    const c =
+      cards[i];
+
+
+    const p = {
+
+      reading_id:
+        rid,
+
+      position_number:
+        i+1,
+
+      position_name:
+        c.position_name ||
+        `ตำแหน่งที่ ${i+1}`,
+
+      card_id:
+        c.card_id ||
+        CARDS[0][0],
+
+      orientation:
+        c.orientation ||
+        "upright",
+
+      interpretation:
+        c.interpretation ||
+        ""
+
+    };
+
+
+    if(c.id){
+
+      await sb
+        .from("reading_cards")
+        .update(p)
+        .eq(
+          "id",
+          c.id
+        );
+
+    }
+    else{
+
+      const {
+        data
+      } =
+        await sb
+          .from(
+            "reading_cards"
+          )
+          .insert(p)
+          .select()
+          .single();
+
+
+      if(data)
+        c.id =
+          data.id;
+
+    }
+
+  }
+
+}
+
+
+/* =========================================================
+   SAVE SECTIONS
+========================================================= */
+
+async function saveSections(
+  rid
+){
+
+  const {
+    data:old
+  } =
+    await sb
+      .from(
+        "reading_sections"
+      )
+      .select("id")
+      .eq(
+        "reading_id",
+        rid
+      );
+
+
+  const keep =
+    sections
+      .filter(
+        x => x.id
+      )
+      .map(
+        x => x.id
+      );
+
+
+  const rm =
+    (old || [])
+      .map(
+        x => x.id
+      )
+      .filter(
+        id =>
+          !keep.includes(id)
+      );
+
+
+  if(rm.length){
+
+    await sb
+      .from(
+        "reading_sections"
+      )
+      .delete()
+      .in(
+        "id",
+        rm
+      );
+
+  }
+
+
+  for(
+    let i=0;
+    i<sections.length;
+    i++
+  ){
+
+    const s =
+      sections[i];
+
+
+    const p = {
+
+      reading_id:
+        rid,
+
+      title:
+        s.title ||
+        "ข้อความเพิ่มเติม",
+
+      content:
+        s.content ||
+        "",
+
+      sort_order:i
+
+    };
+
+
+    if(s.id){
+
+      await sb
+        .from(
+          "reading_sections"
+        )
+        .update(p)
+        .eq(
+          "id",
+          s.id
+        );
+
+    }
+    else{
+
+      const {
+        data
+      } =
+        await sb
+          .from(
+            "reading_sections"
+          )
+          .insert(p)
+          .select()
+          .single();
+
+
+      if(data)
+        s.id =
+          data.id;
+
+    }
+
+  }
+
+}
+
+
+/* =========================================================
+   TEMPLATE PICKER
+========================================================= */
+
+function pickTemplate(){
+
+  modal(
+
+    "🌷 เลือก Template",
+
+    `
+
+      <div class="list">
+
+        ${
+          templates
+            .map(
+              t => `
+
+                <div class="item">
+
+                  <div class="grow">
+
+                    <b>
+                      ${esc(t.title)}
+                    </b>
+
+                    <span class="muted">
+                      ${esc(
+                        t.category || ""
+                      )}
+                    </span>
+
+                  </div>
+
+
+                  <button
+                    class="btn soft small"
+                    onclick="
+                      insertTemplate(
+                        '${t.id}'
+                      )
+                    "
+                  >
+                    แทรก
+                  </button>
+
+                </div>
+
+              `
+            )
+            .join("")
+          ||
+          `
+            <div class="empty">
+              ยังไม่มี Template
+            </div>
+          `
+        }
+
+      </div>
+
+    `
+
+  );
+
+}
+
+
+function insertTemplate(id){
+
+  const t =
+    templates.find(
+      x => x.id === id
+    );
+
+
+  if(!t)
+    return;
+
+
+  sections.push({
+
+    title:
+      t.title,
+
+    content:
+      t.content,
+
+    sort_order:
+      sections.length
+
+  });
+
+
+  closeModal();
+
+  renderSections();
+
+  auto();
+
+}
+
+
+/* =========================================================
+   CLONE READING
+========================================================= */
+
+async function cloneReading(id){
+
+  const r =
+    readings.find(
+      x => x.id === id
+    );
+
+
+  if(!r)
+    return;
+
+
+  const {
+    data:n,
+    error
+  } =
+    await sb
+      .from("readings")
+      .insert({
+
+        member_id:
+          r.member_id,
+
+        service_id:
+          r.service_id,
+
+        question:"",
+
+        started_at:
+          new Date()
+            .toISOString(),
+
+        deadline_at:
+          new Date(
+            Date.now() +
+            864e5
+          ).toISOString(),
+
+        status:
+          "pending",
+
+        overall_reading:"",
+
+        private_note:""
+
+      })
+      .select()
+      .single();
+
+
+  if(error)
+    return toast(
+      error.message
+    );
+
+
+  const [
+    a,
+    b
+  ] =
+    await Promise.all([
+
+      sb
+        .from(
+          "reading_cards"
+        )
+        .select("*")
+        .eq(
+          "reading_id",
+          id
+        )
+        .order(
+          "position_number"
+        ),
+
+      sb
+        .from(
+          "reading_sections"
+        )
+        .select("*")
+        .eq(
+          "reading_id",
+          id
+        )
+        .order(
+          "sort_order"
+        )
+
+    ]);
+
+
+  if(
+    a.data?.length
+  ){
+
+    await sb
+      .from(
+        "reading_cards"
+      )
+      .insert(
+        a.data.map(
+          x => ({
+
+            reading_id:
+              n.id,
+
+            position_number:
+              x.position_number,
+
+            position_name:
+              x.position_name,
+
+            card_id:
+              x.card_id,
+
+            orientation:
+              x.orientation,
+
+            interpretation:""
+
+          })
+        )
+      );
+
+  }
+
+
+  if(
+    b.data?.length
+  ){
+
+    await sb
+      .from(
+        "reading_sections"
+      )
+      .insert(
+        b.data.map(
+          (x,i) => ({
+
+            reading_id:
+              n.id,
+
+            title:
+              x.title,
+
+            content:"",
+
+            sort_order:i
+
+          })
+        )
+      );
+
+  }
+
+
+  await load();
+
+  openReading(n.id);
+
+  toast(
+    "สร้างงานใหม่จากงานเดิมแล้ว 🌷"
+  );
+
+}
+
+
+/* =========================================================
+   DELETE READING
+========================================================= */
+
+async function delCurrent(){
+
+  if(
+    !current.id ||
+    !confirm(
+      "ลบงานนี้และข้อมูลไพ่/ข้อความทั้งหมดหรือไม่?"
+    )
+  )
+    return;
+
+
+  await sb
+    .from("readings")
+    .delete()
+    .eq(
+      "id",
+      current.id
+    );
+
+
+  await load();
+
+  page("readings");
+
+  toast(
+    "ลบงานแล้ว"
+  );
+
+}
+
+
+/* =========================================================
+   PRINT
+========================================================= */
+
+async function printCurrent(){
+
+  if(!current.id){
+
+    await save(true);
+
+  }
+
+
+  printReading(
+    current.id
+  );
+
+}
+
+
+async function printReading(
+  id
+){
+
+  const r =
+    readings.find(
+      x => x.id === id
+    ) ||
+    current;
+
+
+  const [
+    a,
+    b
+  ] =
+    await Promise.all([
+
+      sb
+        .from(
+          "reading_cards"
+        )
+        .select("*")
+        .eq(
+          "reading_id",
+          id
+        )
+        .order(
+          "position_number"
+        ),
+
+      sb
+        .from(
+          "reading_sections"
+        )
+        .select("*")
+        .eq(
+          "reading_id",
+          id
+        )
+        .order(
+          "sort_order"
+        )
+
+    ]);
+
+
+  const cardName =
+    id =>
+      CARDS.find(
+        x => x[0] === id
+      )?.[1] ||
+      id;
+
+
+  const w =
+    window.open(
+      "",
+      "_blank"
+    );
+
+
+  w.document.write(`
+
+    <!doctype html>
+
+    <html lang="th">
+
+    <head>
+
+      <meta charset="utf-8">
+
+      <title>
+        Tarot Reading
+      </title>
+
+      <style>
+
+        body{
+          font-family:
+            system-ui,
+            "Noto Sans Thai";
+          background:#f7f0f3;
+          color:#4e4148;
+          padding:20px;
+        }
+
+        .paper{
+          max-width:760px;
+          margin:auto;
+          background:white;
+          padding:40px;
+          border-radius:20px;
+        }
+
+        .meta,
+        .item{
+          border:1px solid #eadfe4;
+          border-radius:14px;
+          padding:14px;
+          margin:10px 0;
+        }
+
+        .text{
+          white-space:pre-wrap;
+          line-height:1.8;
+        }
+
+        .muted{
+          color:#88777e;
+          font-size:13px;
+        }
+
+        @media print{
+
+          body{
+            background:white;
+          }
+
+          .paper{
+            box-shadow:none;
+          }
+
+        }
+
+      </style>
+
+    </head>
+
+
+    <body>
+
+      <div class="paper">
+
+        <div
+          style="
+            text-align:center;
+            font-size:32px
+          "
+        >
+          🔮 ✦ ☾
+        </div>
+
+
+        <h1
+          style="
+            text-align:center
+          "
+        >
+          Tarot Reading
+        </h1>
+
+
+        <div class="meta">
+
+          <b>
+            สมาชิก:
+          </b>
+
+          ${esc(
+            memberName(
+              r.member_id
+            )
+          )}
+
+          <br>
+
+
+          <b>
+            บริการ:
+          </b>
+
+          ${esc(
+            serviceName(
+              r.service_id
+            )
+          )}
+
+          <br>
+
+
+          <b>
+            วันที่:
+          </b>
+
+          ${fmt(
+            r.started_at
+          )}
+
+          <br>
+
+
+          <b>
+            คำถาม:
+          </b>
+
+          ${esc(
+            r.question || "-"
+          )}
+
+        </div>
+
+
+        <h2>
+          🃏 ไพ่ที่เปิด
+        </h2>
+
+
+        ${
+          (a.data || [])
+            .map(
+              x => `
+
+                <div class="item">
+
+                  <b>
+                    #${x.position_number}
+                    ·
+                    ${esc(
+                      x.position_name ||
+                      ""
+                    )}
+                  </b>
+
+                  <div class="muted">
+
+                    ${esc(
+                      cardName(
+                        x.card_id
+                      )
+                    )}
+
+                    ·
+
+                    ${
+                      x.orientation ===
+                      "reversed"
+                        ? "กลับหัว"
+                        : "ตรง"
+                    }
+
+                  </div>
+
+                  <div class="text">
+
+                    ${esc(
+                      x.interpretation ||
+                      ""
+                    )}
+
+                  </div>
+
+                </div>
+
+              `
+            )
+            .join("")
+        }
+
+
+        <h2>
+          🌙 ภาพรวม
+        </h2>
+
+
+        <div class="text">
+
+          ${esc(
+            r.overall_reading ||
+            ""
+          )}
+
+        </div>
+
+
+        ${
+          (b.data || [])
+            .map(
+              x => `
+
+                <h2>
+                  ${esc(
+                    x.title
+                  )}
+                </h2>
+
+                <div class="text">
+
+                  ${esc(
+                    x.content || ""
+                  )}
+
+                </div>
+
+              `
+            )
+            .join("")
+        }
+
+
+        <p
+          style="
+            text-align:center;
+            margin-top:35px;
+            color:#a27688
+          "
+        >
+          ขอบคุณที่ไว้วางใจ
+          ให้เราได้อ่านไพ่ให้คุณ ♡
+        </p>
+
+      </div>
+
+
+      <script>
+
+        window.onload =
+          () =>
+            setTimeout(
+              () => print(),
+              400
+            );
+
+      <\/script>
+
+    </body>
+
+    </html>
+
+  `);
+
+
+  w.document.close();
+
+}
+
+
+/* =========================================================
+   TEMPLATES
+========================================================= */
+
+function templatesPage(){
+
+  $("templates")
+    .innerHTML = `
+
+      <div class="pagehead">
+
+        <div>
+
+          <h1>
+            🌷 Templates
+          </h1>
+
+          <p>
+            ข้อความที่ใช้บ่อย
+            แทรกในงานอ่านไพ่ได้ทันที
+          </p>
+
+        </div>
+
+
+        <button
+          class="btn primary"
+          onclick="templateModal()"
+        >
+          ＋ เพิ่ม Template
+        </button>
+
+      </div>
+
+
+      <div class="grid2">
+
+        ${
+          templates
+            .map(
+              t => `
+
+                <div class="card">
+
+                  <span
+                    class="badge purple"
+                  >
+                    ${esc(
+                      t.category ||
+                      "ทั่วไป"
+                    )}
+                  </span>
+
+
+                  <h2
+                    style="font-size:17px"
+                  >
+                    ${esc(t.title)}
+                  </h2>
+
+
+                  <div
+                    class="muted"
+                    style="
+                      white-space:pre-wrap
+                    "
+                  >
+                    ${esc(
+                      t.content
+                    )}
+                  </div>
+
+
+                  <div
+                    class="actions"
+                    style="margin-top:12px"
+                  >
+
+                    <button
+                      class="btn ghost small"
+                      onclick="
+                        templateModal(
+                          '${t.id}'
+                        )
+                      "
+                    >
+                      แก้ไข
+                    </button>
+
+
+                    <button
+                      class="btn danger small"
+                      onclick="
+                        delTemplate(
+                          '${t.id}'
+                        )
+                      "
+                    >
+                      ลบ
+                    </button>
+
+                  </div>
+
+                </div>
+
+              `
+            )
+            .join("")
+          ||
+          `
+            <div class="card empty">
+              ยังไม่มี Template 💕
+            </div>
+          `
+        }
+
+      </div>
+
+    `;
+
+}
+
+
+function templateModal(id){
+
+  const t =
+    id
+      ? templates.find(
+          x => x.id === id
+        )
+      : {};
+
+
+  modal(
+
+    id
+      ? "แก้ไข Template"
+      : "＋ เพิ่ม Template",
+
+    `
+
+      <div class="form">
+
+        <div class="field">
+
+          <label>
+            ชื่อ
+          </label>
+
+          <input
+            id="tt"
+            class="input"
+            value="${esc(
+              t?.title || ""
+            )}"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            หมวด
+          </label>
+
+          <input
+            id="tc"
+            class="input"
+            value="${esc(
+              t?.category || ""
+            )}"
+          >
+
+        </div>
+
+
+        <div class="field full">
+
+          <label>
+            ข้อความ
+          </label>
+
+          <textarea
+            id="tx"
+            class="textarea"
+            style="min-height:180px"
+          >${esc(
+            t?.content || ""
+          )}</textarea>
+
+        </div>
+
+      </div>
+
+
+      <button
+        class="btn primary"
+        style="margin-top:13px"
+        onclick="
+          saveTemplate(
+            '${id || ""}'
+          )
+        "
+      >
+        บันทึก Template
+      </button>
+
+    `
+
+  );
+
+}
+
+
+async function saveTemplate(id){
+
+  const p = {
+
+    title:
+      $("tt")
+        .value
+        .trim(),
+
+    category:
+      $("tc")
+        .value
+        .trim(),
+
+    content:
+      $("tx").value
+
+  };
+
+
+  if(
+    !p.title ||
+    !p.content
+  )
+    return toast(
+      "กรุณากรอกข้อมูล"
+    );
+
+
+  const {
+    error
+  } =
+    id
+      ? await sb
+          .from("templates")
+          .update(p)
+          .eq("id",id)
+      : await sb
+          .from("templates")
+          .insert(p);
+
+
+  if(error)
+    return toast(
+      error.message
+    );
+
+
+  closeModal();
+
+  await load();
+
+  templatesPage();
+
+}
+
+
+async function delTemplate(id){
+
+  if(
+    !confirm(
+      "ลบ Template นี้หรือไม่?"
+    )
+  )
+    return;
+
+
+  await sb
+    .from("templates")
+    .delete()
+    .eq("id",id);
+
+
+  await load();
+
+  templatesPage();
+
+}
+
+
+/* =========================================================
+   REVIEWS
+========================================================= */
+
+function reviewsPage(){
+
+  $("reviews")
+    .innerHTML = `
+
+      <div class="pagehead">
+
+        <div>
+
+          <h1>
+            💌 รีวิวจากลูกค้า
+          </h1>
+
+          <p>
+            คัดลอกจากแชตภายนอกมาเก็บไว้
+            เพื่อพัฒนางาน
+          </p>
+
+        </div>
+
+
+        <button
+          class="btn primary"
+          onclick="reviewModal()"
+        >
+          ＋ เพิ่มรีวิว
+        </button>
+
+      </div>
+
+
+      <div class="card">
+
+        <div class="list">
+
+          ${
+            reviews
+              .map(
+                r => `
+
+                  <div class="item">
+
+                    <span
+                      style="
+                        font-size:20px
+                      "
+                    >
+                      💗
+                    </span>
+
+
+                    <div class="grow">
+
+                      <b>
+
+                        ${esc(
+                          memberName(
+                            r.member_id
+                          )
+                        )}
+
+                        ·
+
+                        ${
+                          "★".repeat(
+                            r.rating || 0
+                          )
+                        }
+
+                      </b>
+
+
+                      <span class="muted">
+
+                        ${fmt(
+                          r.review_date
+                        )}
+
+                        ·
+
+                        ${esc(
+                          r.channel || ""
+                        )}
+
+                      </span>
+
+
+                      <div
+                        style="
+                          white-space:pre-wrap;
+                          margin-top:5px
+                        "
+                      >
+
+                        ${esc(
+                          r.review_text ||
+                          ""
+                        )}
+
+                      </div>
+
+                    </div>
+
+
+                    <button
+                      class="btn danger small"
+                      onclick="
+                        delReview(
+                          '${r.id}'
+                        )
+                      "
+                    >
+                      ลบ
+                    </button>
+
+                  </div>
+
+                `
+              )
+              .join("")
+            ||
+            `
+              <div class="empty">
+                ยังไม่มีรีวิว 💌
+              </div>
+            `
+          }
+
+        </div>
+
+      </div>
+
+    `;
+
+}
+
+
+function reviewModal(){
+
+  modal(
+
+    "💌 เพิ่มรีวิวจากลูกค้า",
+
+    `
+
+      <div class="form">
+
+        <div class="field">
+
+          <label>
+            สมาชิก
+          </label>
+
+          <select
+            id="rm"
+            class="select"
+          >
+
+            <option value="">
+              — เลือก —
+            </option>
+
+            ${
+              members
+                .map(
+                  m => `
+
+                    <option
+                      value="${m.id}"
+                    >
+                      ${esc(
+                        m.name
+                      )}
+                    </option>
+
+                  `
+                )
+                .join("")
+            }
+
+          </select>
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            งานที่เกี่ยวข้อง
+          </label>
+
+          <select
+            id="rr"
+            class="select"
+          >
+
+            <option value="">
+              — ไม่ระบุ —
+            </option>
+
+            ${
+              readings
+                .map(
+                  r => `
+
+                    <option
+                      value="${r.id}"
+                    >
+                      ${esc(
+                        memberName(
+                          r.member_id
+                        )
+                      )}
+
+                      ·
+
+                      ${esc(
+                        r.question ||
+                        serviceName(
+                          r.service_id
+                        )
+                      )}
+
+                    </option>
+
+                  `
+                )
+                .join("")
+            }
+
+          </select>
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            วันที่
+          </label>
+
+          <input
+            id="rd"
+            class="input"
+            type="datetime-local"
+            value="${dt(
+              new Date()
+            )}"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            ช่องทาง
+          </label>
+
+          <input
+            id="rc"
+            class="input"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            คะแนน
+          </label>
+
+          <select
+            id="ra"
+            class="select"
+          >
+
+            ${
+              [5,4,3,2,1]
+                .map(
+                  n => `
+
+                    <option
+                      value="${n}"
+                    >
+                      ${
+                        "★".repeat(n)
+                      }
+                      (${n}/5)
+                    </option>
+
+                  `
+                )
+                .join("")
+            }
+
+          </select>
+
+        </div>
+
+
+        <div class="field full">
+
+          <label>
+            ข้อความรีวิว
+          </label>
+
+          <textarea
+            id="rt"
+            class="textarea"
+          ></textarea>
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            สิ่งที่ลูกค้าชอบ
+          </label>
+
+          <textarea
+            id="rl"
+            class="textarea"
+          ></textarea>
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            สิ่งที่ควรปรับปรุง
+          </label>
+
+          <textarea
+            id="ri"
+            class="textarea"
+          ></textarea>
+
+        </div>
+
+
+        <div class="field full">
+
+          <label>
+            หมายเหตุเพื่อพัฒนางาน
+          </label>
+
+          <textarea
+            id="rdev"
+            class="textarea"
+          ></textarea>
+
+        </div>
+
+      </div>
+
+
+      <button
+        class="btn primary"
+        style="margin-top:13px"
+        onclick="saveReview()"
+      >
+        บันทึกรีวิว 💕
+      </button>
+
+    `
+
+  );
+
+}
+
+
+async function saveReview(){
+
+  const p = {
+
+    member_id:
+      $("rm").value ||
+      null,
+
+    reading_id:
+      $("rr").value ||
+      null,
+
+    review_date:
+      new Date(
+        $("rd").value
+      ).toISOString(),
+
+    channel:
+      $("rc").value,
+
+    rating:
+      Number(
+        $("ra").value
+      ),
+
+    review_text:
+      $("rt").value,
+
+    liked_points:
+      $("rl").value,
+
+    improvement_points:
+      $("ri").value,
+
+    development_note:
+      $("rdev").value
+
+  };
+
+
+  const {
+    error
+  } =
+    await sb
+      .from("reviews")
+      .insert(p);
+
+
+  if(error)
+    return toast(
+      error.message
+    );
+
+
+  closeModal();
+
+  await load();
+
+  reviewsPage();
+
+  toast(
+    "เก็บรีวิวแล้ว 💌"
+  );
+
+}
+
+
+async function delReview(id){
+
+  if(
+    !confirm(
+      "ลบรีวิวนี้หรือไม่?"
+    )
+  )
+    return;
+
+
+  await sb
+    .from("reviews")
+    .delete()
+    .eq(
+      "id",
+      id
+    );
+
+
+  await load();
+
+  reviewsPage();
+
+}
+
+</script>
+
+</body>
+</html>
