@@ -1,0 +1,3633 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#f5f2eb">
+<title>Tarot Note — Personal Tarot Helper</title>
+
+<style>
+:root{
+  --bg:#f4f1ea;
+  --paper:#fffdf8;
+  --paper2:#f9f6ef;
+  --ink:#25221e;
+  --muted:#777168;
+  --line:#ddd6ca;
+  --accent:#65594c;
+  --accent2:#8b7b69;
+  --soft:#eee8dd;
+  --danger:#9a625f;
+  --shadow:0 8px 30px rgba(44,38,30,.07);
+  --radius:18px;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
+    "Noto Sans Thai","Noto Sans",sans-serif;
+  -webkit-tap-highlight-color:transparent;
+}
+
+button,
+input,
+textarea{
+  font:inherit;
+}
+
+button{
+  touch-action:manipulation;
+}
+
+img{
+  max-width:100%;
+}
+
+.app{
+  min-height:100vh;
+  padding-bottom:calc(82px + env(safe-area-inset-bottom));
+}
+
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:30;
+  background:rgba(244,241,234,.94);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line);
+  padding:
+    calc(12px + env(safe-area-inset-top))
+    16px 12px;
+}
+
+.topbar-inner{
+  max-width:1180px;
+  margin:auto;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.brand{
+  font-weight:800;
+  letter-spacing:.02em;
+}
+
+.brand small{
+  display:block;
+  font-weight:500;
+  color:var(--muted);
+  font-size:11px;
+  margin-top:2px;
+}
+
+.top-actions{
+  display:flex;
+  gap:7px;
+}
+
+.icon-btn{
+  border:1px solid var(--line);
+  background:var(--paper);
+  color:var(--ink);
+  min-width:42px;
+  min-height:42px;
+  border-radius:13px;
+  cursor:pointer;
+}
+
+main{
+  max-width:1180px;
+  margin:auto;
+  padding:18px 14px 30px;
+}
+
+.page{
+  display:none;
+}
+
+.page.active{
+  display:block;
+}
+
+.hero{
+  margin-bottom:18px;
+}
+
+.hero h1{
+  margin:0 0 6px;
+  font-size:27px;
+  line-height:1.2;
+}
+
+.hero p{
+  margin:0;
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.7;
+}
+
+.panel{
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:15px;
+  margin-bottom:14px;
+}
+
+.panel-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:12px;
+}
+
+.panel-title h2,
+.panel-title h3{
+  margin:0;
+  font-size:17px;
+}
+
+.label{
+  display:block;
+  font-size:12px;
+  color:var(--muted);
+  margin-bottom:7px;
+}
+
+textarea,
+input[type="text"],
+input[type="search"]{
+  width:100%;
+  border:1px solid var(--line);
+  background:#fffefa;
+  border-radius:13px;
+  padding:12px 13px;
+  color:var(--ink);
+  outline:none;
+}
+
+textarea{
+  min-height:90px;
+  resize:vertical;
+  line-height:1.6;
+}
+
+textarea:focus,
+input:focus{
+  border-color:var(--accent2);
+  box-shadow:0 0 0 3px rgba(101,89,76,.08);
+}
+
+.spread-tabs{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:7px;
+}
+
+.spread-tabs button{
+  min-height:44px;
+  border:1px solid var(--line);
+  background:var(--paper2);
+  border-radius:12px;
+  cursor:pointer;
+  color:var(--ink);
+  font-weight:650;
+}
+
+.spread-tabs button.active{
+  background:var(--ink);
+  color:#fff;
+  border-color:var(--ink);
+}
+
+@media(min-width:600px){
+  .spread-tabs{
+    grid-template-columns:repeat(6,1fr);
+  }
+}
+
+.board-wrap{
+  overflow:auto;
+  padding:4px;
+}
+
+.board{
+  min-width:290px;
+  min-height:280px;
+  display:grid;
+  gap:9px;
+  align-items:center;
+  justify-items:center;
+}
+
+.board.one{
+  grid-template-columns:1fr;
+}
+
+.board.three{
+  grid-template-columns:repeat(3,1fr);
+}
+
+.board.five{
+  grid-template-columns:repeat(5,1fr);
+  grid-template-rows:repeat(5,1fr);
+}
+
+.board.five .slot:nth-child(1){grid-column:3;grid-row:1;}
+.board.five .slot:nth-child(2){grid-column:3;grid-row:3;}
+.board.five .slot:nth-child(3){grid-column:1;grid-row:3;}
+.board.five .slot:nth-child(4){grid-column:5;grid-row:3;}
+.board.five .slot:nth-child(5){grid-column:3;grid-row:5;}
+
+.board.seven{
+  grid-template-columns:repeat(7,1fr);
+  grid-template-rows:repeat(2,1fr);
+}
+
+.board.seven .slot:nth-child(1){grid-column:1;}
+.board.seven .slot:nth-child(2){grid-column:2;}
+.board.seven .slot:nth-child(3){grid-column:3;}
+.board.seven .slot:nth-child(4){grid-column:4;}
+.board.seven .slot:nth-child(5){grid-column:5;}
+.board.seven .slot:nth-child(6){grid-column:6;}
+.board.seven .slot:nth-child(7){grid-column:7;}
+
+.board.cross{
+  grid-template-columns:repeat(5,1fr);
+  grid-template-rows:repeat(5,1fr);
+}
+
+.board.cross .slot:nth-child(1){grid-column:3;grid-row:3;}
+.board.cross .slot:nth-child(2){grid-column:3;grid-row:2;}
+.board.cross .slot:nth-child(3){grid-column:2;grid-row:3;}
+.board.cross .slot:nth-child(4){grid-column:3;grid-row:4;}
+.board.cross .slot:nth-child(5){grid-column:4;grid-row:3;}
+.board.cross .slot:nth-child(6){grid-column:5;grid-row:1;}
+.board.cross .slot:nth-child(7){grid-column:5;grid-row:2;}
+.board.cross .slot:nth-child(8){grid-column:5;grid-row:3;}
+.board.cross .slot:nth-child(9){grid-column:5;grid-row:4;}
+.board.cross .slot:nth-child(10){grid-column:5;grid-row:5;}
+
+.board.houses{
+  grid-template-columns:repeat(4,1fr);
+  grid-template-rows:repeat(4,1fr);
+}
+
+.board.houses .slot:nth-child(1){grid-column:2;grid-row:1;}
+.board.houses .slot:nth-child(2){grid-column:3;grid-row:1;}
+.board.houses .slot:nth-child(3){grid-column:4;grid-row:1;}
+.board.houses .slot:nth-child(4){grid-column:4;grid-row:2;}
+.board.houses .slot:nth-child(5){grid-column:4;grid-row:3;}
+.board.houses .slot:nth-child(6){grid-column:4;grid-row:4;}
+.board.houses .slot:nth-child(7){grid-column:3;grid-row:4;}
+.board.houses .slot:nth-child(8){grid-column:2;grid-row:4;}
+.board.houses .slot:nth-child(9){grid-column:1;grid-row:4;}
+.board.houses .slot:nth-child(10){grid-column:1;grid-row:3;}
+.board.houses .slot:nth-child(11){grid-column:1;grid-row:2;}
+.board.houses .slot:nth-child(12){grid-column:1;grid-row:1;}
+
+.slot{
+  width:100%;
+  max-width:115px;
+  min-height:142px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--paper2);
+  padding:7px;
+  cursor:pointer;
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  transition:.15s ease;
+}
+
+.slot.selected{
+  border-color:var(--ink);
+  box-shadow:0 0 0 2px rgba(37,34,30,.12);
+  transform:translateY(-2px);
+}
+
+.slot.empty{
+  justify-content:center;
+  align-items:center;
+  color:var(--muted);
+  text-align:center;
+}
+
+.slot-number{
+  font-size:10px;
+  color:var(--muted);
+  text-align:left;
+}
+
+.slot img,
+.card-thumb img{
+  width:100%;
+  display:block;
+  object-fit:cover;
+  border-radius:8px;
+  background:#e9e3d8;
+}
+
+.slot img{
+  aspect-ratio:2/3;
+}
+
+.card-placeholder{
+  aspect-ratio:2/3;
+  border-radius:8px;
+  background:#e8e1d5;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:8px;
+  font-size:11px;
+  color:#665d53;
+}
+
+.reversed img{
+  transform:rotate(180deg);
+}
+
+.slot-name{
+  font-size:10px;
+  line-height:1.3;
+  font-weight:700;
+  text-align:center;
+}
+
+.orientation{
+  font-size:9px;
+  color:var(--muted);
+  text-align:center;
+}
+
+.position-list{
+  display:grid;
+  gap:8px;
+}
+
+.position-item{
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--paper2);
+  padding:11px;
+  cursor:pointer;
+}
+
+.position-item.active{
+  border-color:var(--ink);
+  background:#f2ede4;
+}
+
+.position-top{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.position-name{
+  font-weight:750;
+  font-size:13px;
+}
+
+.position-meaning{
+  color:var(--muted);
+  font-size:11px;
+  margin-top:3px;
+}
+
+.position-card{
+  margin-top:7px;
+  font-size:13px;
+}
+
+.reading-actions{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:8px;
+}
+
+.btn{
+  border:1px solid var(--line);
+  background:var(--paper);
+  color:var(--ink);
+  border-radius:13px;
+  min-height:45px;
+  padding:10px 13px;
+  cursor:pointer;
+  font-weight:700;
+}
+
+.btn.primary{
+  background:var(--ink);
+  color:#fff;
+  border-color:var(--ink);
+}
+
+.btn.soft{
+  background:var(--soft);
+}
+
+.btn.danger{
+  color:var(--danger);
+}
+
+@media(min-width:650px){
+  .reading-actions{
+    grid-template-columns:repeat(3,1fr);
+  }
+}
+
+.smart-reading{
+  border:1px solid var(--line);
+  background:#fbf8f1;
+  border-radius:16px;
+  padding:13px;
+}
+
+.smart-actions{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:8px;
+  margin:10px 0;
+}
+
+.smart-btn{
+  min-height:45px;
+  border:1px solid var(--line);
+  border-radius:13px;
+  background:#fffdf8;
+  font-weight:750;
+  cursor:pointer;
+}
+
+.smart-btn.primary{
+  background:#302c27;
+  color:#fff;
+  border-color:#302c27;
+}
+
+@media(min-width:600px){
+  .smart-actions{
+    grid-template-columns:repeat(3,1fr);
+  }
+}
+
+.ai-result{
+  line-height:1.75;
+  font-size:13px;
+}
+
+.ai-question{
+  color:var(--muted);
+  padding:9px 11px;
+  background:var(--paper2);
+  border-radius:11px;
+  margin-bottom:10px;
+}
+
+.ai-position{
+  border-top:1px solid var(--line);
+  padding:12px 0;
+}
+
+.ai-position:first-child{
+  border-top:0;
+}
+
+.ai-position h4{
+  margin:0 0 5px;
+  font-size:14px;
+}
+
+.ai-keywords{
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px;
+  margin:7px 0;
+}
+
+.ai-keywords span,
+.keyword{
+  display:inline-flex;
+  background:var(--soft);
+  border-radius:999px;
+  padding:4px 8px;
+  font-size:10px;
+}
+
+.ai-summary{
+  border-top:1px solid var(--line);
+  margin-top:10px;
+  padding-top:12px;
+}
+
+.card-picker{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+}
+
+@media(min-width:600px){
+  .card-picker{
+    grid-template-columns:repeat(6,1fr);
+  }
+}
+
+@media(min-width:1000px){
+  .card-picker{
+    grid-template-columns:repeat(8,1fr);
+  }
+}
+
+.picker-card{
+  border:1px solid var(--line);
+  background:var(--paper2);
+  border-radius:12px;
+  padding:5px;
+  cursor:pointer;
+}
+
+.picker-card.selected{
+  border-color:var(--ink);
+  box-shadow:0 0 0 2px rgba(37,34,30,.1);
+}
+
+.picker-card img{
+  width:100%;
+  aspect-ratio:2/3;
+  object-fit:cover;
+  border-radius:8px;
+}
+
+.picker-card-name{
+  font-size:9px;
+  line-height:1.25;
+  text-align:center;
+  margin-top:4px;
+  font-weight:700;
+}
+
+.filter-row{
+  display:flex;
+  gap:7px;
+  overflow:auto;
+  padding-bottom:2px;
+  margin:10px 0;
+}
+
+.filter-btn{
+  flex:0 0 auto;
+  min-height:39px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:0 13px;
+  background:var(--paper);
+  cursor:pointer;
+}
+
+.filter-btn.active{
+  background:var(--ink);
+  color:#fff;
+}
+
+.library-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+}
+
+@media(min-width:600px){
+  .library-grid{
+    grid-template-columns:repeat(4,1fr);
+  }
+}
+
+@media(min-width:900px){
+  .library-grid{
+    grid-template-columns:repeat(6,1fr);
+  }
+}
+
+.library-card{
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:15px;
+  padding:7px;
+  cursor:pointer;
+  box-shadow:var(--shadow);
+}
+
+.library-card img{
+  width:100%;
+  aspect-ratio:2/3;
+  object-fit:cover;
+  border-radius:9px;
+}
+
+.library-name{
+  font-weight:750;
+  font-size:11px;
+  line-height:1.35;
+  margin-top:7px;
+}
+
+.library-pron{
+  font-size:9px;
+  color:var(--muted);
+  margin-top:2px;
+}
+
+.library-mini{
+  margin-top:6px;
+  display:flex;
+  gap:4px;
+  flex-wrap:wrap;
+}
+
+.library-mini span{
+  font-size:8px;
+  background:var(--soft);
+  padding:3px 6px;
+  border-radius:999px;
+}
+
+.detail-modal{
+  position:fixed;
+  inset:0;
+  z-index:100;
+  background:rgba(30,27,23,.48);
+  display:none;
+  align-items:flex-end;
+  justify-content:center;
+  padding:10px;
+}
+
+.detail-modal.open{
+  display:flex;
+}
+
+.detail-box{
+  width:min(760px,100%);
+  max-height:92vh;
+  overflow:auto;
+  background:var(--paper);
+  border-radius:22px 22px 0 0;
+  padding:16px;
+}
+
+.detail-top{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:flex-start;
+}
+
+.detail-layout{
+  display:grid;
+  grid-template-columns:130px 1fr;
+  gap:14px;
+}
+
+.detail-image img{
+  width:100%;
+  aspect-ratio:2/3;
+  object-fit:cover;
+  border-radius:10px;
+}
+
+.detail-info h2{
+  margin:0 0 3px;
+  font-size:20px;
+}
+
+.detail-info .pron{
+  color:var(--muted);
+  font-size:12px;
+  margin-bottom:8px;
+}
+
+.detail-section{
+  margin-top:14px;
+  border-top:1px solid var(--line);
+  padding-top:11px;
+}
+
+.detail-section h3{
+  margin:0 0 7px;
+  font-size:13px;
+}
+
+.meaning-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+}
+
+.meaning-box{
+  background:var(--paper2);
+  border-radius:10px;
+  padding:9px;
+}
+
+.meaning-box b{
+  display:block;
+  font-size:10px;
+  color:var(--muted);
+  margin-bottom:4px;
+}
+
+.meaning-box span{
+  font-size:12px;
+  line-height:1.5;
+}
+
+.notes-list{
+  display:grid;
+  gap:9px;
+}
+
+.note{
+  border:1px solid var(--line);
+  background:var(--paper);
+  border-radius:14px;
+  padding:12px;
+}
+
+.note-date{
+  color:var(--muted);
+  font-size:10px;
+  margin-bottom:5px;
+}
+
+.note-question{
+  font-weight:750;
+  font-size:13px;
+}
+
+.note-body{
+  font-size:12px;
+  color:#5e584f;
+  line-height:1.6;
+  margin-top:5px;
+}
+
+.empty-state{
+  text-align:center;
+  color:var(--muted);
+  padding:28px 12px;
+}
+
+.shop-page{
+  max-width:760px;
+  margin:auto;
+}
+
+.shop-placeholder{
+  text-align:center;
+  padding:34px 18px;
+}
+
+.shop-placeholder .shop-icon{
+  font-size:42px;
+  margin-bottom:10px;
+}
+
+.shop-placeholder h2{
+  margin:0 0 8px;
+}
+
+.shop-placeholder p{
+  color:var(--muted);
+  line-height:1.7;
+  font-size:13px;
+}
+
+.bottom-nav{
+  position:fixed;
+  z-index:40;
+  left:0;
+  right:0;
+  bottom:0;
+  background:rgba(255,253,248,.96);
+  backdrop-filter:blur(14px);
+  border-top:1px solid var(--line);
+  padding:
+    7px 8px
+    calc(7px + env(safe-area-inset-bottom));
+}
+
+.bottom-nav-inner{
+  max-width:720px;
+  margin:auto;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:5px;
+}
+
+.nav-btn{
+  border:0;
+  background:transparent;
+  color:var(--muted);
+  min-height:53px;
+  border-radius:12px;
+  cursor:pointer;
+  font-size:11px;
+}
+
+.nav-btn.active{
+  background:var(--soft);
+  color:var(--ink);
+  font-weight:800;
+}
+
+.nav-icon{
+  display:block;
+  font-size:19px;
+  margin-bottom:2px;
+}
+
+.close-btn{
+  border:1px solid var(--line);
+  background:var(--paper2);
+  width:40px;
+  height:40px;
+  border-radius:12px;
+  cursor:pointer;
+}
+
+.mini-meta{
+  color:var(--muted);
+  font-size:11px;
+}
+
+.orientation-buttons{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+  margin-top:9px;
+}
+
+.orientation-buttons button{
+  min-height:42px;
+  border:1px solid var(--line);
+  background:var(--paper);
+  border-radius:11px;
+  cursor:pointer;
+}
+
+.orientation-buttons button.active{
+  background:var(--ink);
+  color:#fff;
+}
+
+.selected-card{
+  display:grid;
+  grid-template-columns:100px 1fr;
+  gap:12px;
+}
+
+.selected-card img{
+  width:100%;
+  aspect-ratio:2/3;
+  object-fit:cover;
+  border-radius:9px;
+}
+
+.selected-card h3{
+  margin:0 0 2px;
+  font-size:16px;
+}
+
+.selected-card p{
+  margin:4px 0;
+  color:var(--muted);
+  font-size:11px;
+  line-height:1.5;
+}
+
+@media(min-width:900px){
+  main{
+    padding-left:20px;
+    padding-right:20px;
+  }
+
+  .reader-layout{
+    display:grid;
+    grid-template-columns:minmax(0,1.3fr) minmax(300px,.7fr);
+    gap:14px;
+    align-items:start;
+  }
+
+  .reader-left,
+  .reader-right{
+    min-width:0;
+  }
+
+  .detail-modal{
+    align-items:center;
+  }
+
+  .detail-box{
+    border-radius:22px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      Tarot Note
+      <small>Personal Tarot Helper</small>
+    </div>
+
+    <div class="top-actions">
+      <button class="icon-btn" onclick="showPage('shop')" aria-label="ร้านค้า">🛍️</button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section id="page-reader" class="page active">
+
+  <div class="hero">
+    <h1>ช่วยอ่านไพ่</h1>
+    <p>เลือกไพ่ตามตำแหน่ง แล้วเชื่อมความหมายเข้ากับคำถามจริงของคุณ</p>
+  </div>
+
+  <div class="reader-layout">
+
+    <div class="reader-left">
+
+      <div class="panel">
+
+        <div class="panel-title">
+          <h2>คำถาม</h2>
+        </div>
+
+        <textarea
+          id="questionInput"
+          placeholder="พิมพ์คำถาม เช่น งานที่กำลังทำอยู่ควรโฟกัสอะไร..."
+          oninput="updateQuestionPreview()"
+        ></textarea>
+
+      </div>
+
+      <div class="panel">
+
+        <div class="panel-title">
+          <h2>จำนวนไพ่ / รูปแบบการเปิด</h2>
+        </div>
+
+        <div id="spreadTabs" class="spread-tabs"></div>
+
+      </div>
+
+      <div class="panel">
+
+        <div class="panel-title">
+          <h2 id="boardTitle">กระดานไพ่</h2>
+          <span class="mini-meta" id="cardCount">0 ใบ</span>
+        </div>
+
+        <div class="board-wrap">
+          <div id="board" class="board one"></div>
+        </div>
+
+      </div>
+
+      <div class="panel">
+
+        <div class="panel-title">
+          <h2>ตำแหน่ง</h2>
+        </div>
+
+        <div id="positionList" class="position-list"></div>
+
+      </div>
+
+      <div class="panel">
+
+        <div class="panel-title">
+          <h2>ไพ่ที่เลือก</h2>
+        </div>
+
+        <div id="selectedCard"></div>
+
+      </div>
+
+      <div class="panel">
+
+        <div class="panel-title">
+          <h2>เลือกไพ่</h2>
+          <span class="mini-meta">เลือกตามตำแหน่งที่กำลังเปิด</span>
+        </div>
+
+        <div class="filter-row">
+          <button class="filter-btn active" onclick="setPickerFilter('all',this)">ทั้งหมด</button>
+          <button class="filter-btn" onclick="setPickerFilter('major',this)">Major</button>
+          <button class="filter-btn" onclick="setPickerFilter('wands',this)">Wands</button>
+          <button class="filter-btn" onclick="setPickerFilter('cups',this)">Cups</button>
+          <button class="filter-btn" onclick="setPickerFilter('swords',this)">Swords</button>
+          <button class="filter-btn" onclick="setPickerFilter('pentacles',this)">Pentacles</button>
+        </div>
+
+        <div id="cardPicker" class="card-picker"></div>
+
+      </div>
+
+    </div>
+
+    <div class="reader-right">
+
+      <div class="panel">
+
+        <div class="panel-title">
+          <h2>การวางไพ่</h2>
+        </div>
+
+        <div id="orientationButtons" class="orientation-buttons">
+          <button id="uprightBtn" class="active" onclick="setOrientation('upright')">
+            ↑ หงาย
+          </button>
+          <button id="reversedBtn" onclick="setOrientation('reversed')">
+            ↓ กลับหัว
+          </button>
+        </div>
+
+      </div>
+
+      <div class="panel">
+
+        <div class="panel-title">
+          <h2>ช่วยอ่าน</h2>
+        </div>
+
+        <div class="smart-reading">
+
+          <div id="smartQuestionPreview" class="ai-question">
+            คำถาม: ยังไม่ได้ใส่คำถาม
+          </div>
+
+          <div class="smart-actions">
+
+            <button class="smart-btn" onclick="smartReadCurrent()">
+              🔎 อ่านตำแหน่งนี้
+            </button>
+
+            <button class="smart-btn" onclick="smartReadCard()">
+              🃏 อ่านไพ่ใบนี้
+            </button>
+
+            <button class="smart-btn primary" onclick="smartReadAll()">
+              ✨ อ่านไพ่ทั้งหมด
+            </button>
+
+          </div>
+
+          <div id="smartReadingResult" class="ai-result">
+            เลือกไพ่แล้วกดปุ่มช่วยอ่าน
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="panel">
+
+        <div class="panel-title">
+          <h2>จัดการการเปิดไพ่</h2>
+        </div>
+
+        <div class="reading-actions">
+
+          <button class="btn primary" onclick="saveReading()">
+            💾 บันทึก
+          </button>
+
+          <button class="btn soft" onclick="interpretReading()">
+            📖 สรุปการเปิดไพ่
+          </button>
+
+          <button class="btn danger" onclick="resetReading()">
+            ↺ เริ่มใหม่
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+<section id="page-library" class="page">
+
+  <div class="hero">
+    <h1>คลังไพ่</h1>
+    <p>78 ใบ — รูปไพ่ คำอ่าน คีย์เวิร์ด และความหมายแยกด้าน</p>
+  </div>
+
+  <div class="panel">
+
+    <input
+      id="librarySearch"
+      type="search"
+      placeholder="ค้นหาชื่อไพ่ / เลข / คำอ่าน / คีย์เวิร์ด..."
+      oninput="renderLibrary()"
+    >
+
+    <div class="filter-row">
+
+      <button class="filter-btn active" onclick="setLibraryFilter('all',this)">
+        ทั้งหมด
+      </button>
+
+      <button class="filter-btn" onclick="setLibraryFilter('major',this)">
+        Major Arcana
+      </button>
+
+      <button class="filter-btn" onclick="setLibraryFilter('wands',this)">
+        Wands
+      </button>
+
+      <button class="filter-btn" onclick="setLibraryFilter('cups',this)">
+        Cups
+      </button>
+
+      <button class="filter-btn" onclick="setLibraryFilter('swords',this)">
+        Swords
+      </button>
+
+      <button class="filter-btn" onclick="setLibraryFilter('pentacles',this)">
+        Pentacles
+      </button>
+
+    </div>
+
+  </div>
+
+  <div id="libraryGrid" class="library-grid"></div>
+
+</section>
+
+<section id="page-notes" class="page">
+
+  <div class="hero">
+    <h1>บันทึก</h1>
+    <p>เก็บคำถามและผลการอ่านไว้ดูย้อนหลัง</p>
+  </div>
+
+  <div class="panel">
+
+    <div class="panel-title">
+      <h2>ประวัติการเปิดไพ่</h2>
+
+      <button class="btn danger" onclick="clearNotes()">
+        ล้างทั้งหมด
+      </button>
+    </div>
+
+    <div id="notesList" class="notes-list"></div>
+
+  </div>
+
+</section>
+
+<section id="page-shop" class="page">
+
+  <div class="shop-page">
+
+    <div class="hero">
+      <h1>ร้านค้า</h1>
+      <p>พื้นที่สำหรับเชื่อมไปยังหน้าร้านของคุณ</p>
+    </div>
+
+    <div class="panel shop-placeholder">
+
+      <div class="shop-icon">🛍️</div>
+
+      <h2>ร้านค้า</h2>
+
+      <p>
+        ตอนนี้ผมทำหน้าปลายทางและปุ่มเชื่อมไว้ให้ก่อน
+        เพื่อให้ระบบหลักสามารถกดเข้าหน้าร้านได้ทันที
+      </p>
+
+      <button class="btn primary" onclick="showPage('reader')">
+        ← กลับไปช่วยอ่านไพ่
+      </button>
+
+    </div>
+
+  </div>
+
+</section>
+
+</main>
+
+<nav class="bottom-nav">
+
+  <div class="bottom-nav-inner">
+
+    <button id="nav-reader" class="nav-btn active" onclick="showPage('reader')">
+      <span class="nav-icon">🃏</span>
+      ช่วยอ่าน
+    </button>
+
+    <button id="nav-library" class="nav-btn" onclick="showPage('library')">
+      <span class="nav-icon">📚</span>
+      คลังไพ่
+    </button>
+
+    <button id="nav-notes" class="nav-btn" onclick="showPage('notes')">
+      <span class="nav-icon">📝</span>
+      บันทึก
+    </button>
+
+    <button id="nav-shop" class="nav-btn" onclick="showPage('shop')">
+      <span class="nav-icon">🛍️</span>
+      ร้านค้า
+    </button>
+
+  </div>
+
+</nav>
+
+<div id="detailModal" class="detail-modal" onclick="closeDetailOutside(event)">
+
+  <div class="detail-box">
+
+    <div class="detail-top">
+
+      <div>
+        <div class="mini-meta">รายละเอียดไพ่</div>
+      </div>
+
+      <button class="close-btn" onclick="closeCardDetail()">×</button>
+
+    </div>
+
+    <div id="detailContent"></div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   CARD DATABASE
+========================================================= */
+
+const MAJOR = [
+
+{
+id:"major-00",
+number:0,
+name:"The Fool",
+pron:"เดอะ ฟูล",
+file:"the-fool.jpg",
+keywordsU:["เริ่มต้น","อิสระ","ลองสิ่งใหม่","ความเชื่อมั่น"],
+keywordsR:["ประมาท","ไม่พร้อม","ลังเล","เสี่ยงเกินไป"],
+yes:"YES",
+meaning:{
+money:"เริ่มต้นแนวทางใหม่ได้ แต่ควรวางแผนก่อนใช้เงิน",
+work:"เหมาะกับการเริ่มโปรเจกต์หรือเส้นทางใหม่",
+love:"เปิดใจต่อประสบการณ์ใหม่ แต่ไม่ควรรีบร้อน",
+family:"บรรยากาศต้องการความผ่อนคลายและพื้นที่ส่วนตัว",
+future:"มีโอกาสใหม่เข้ามา แต่ยังมีสิ่งที่ต้องเรียนรู้",
+overall:"การเริ่มต้น การเปิดใจ และการก้าวออกจากกรอบเดิม"
+}
+},
+
+{
+id:"major-01",
+number:1,
+name:"The Magician",
+pron:"เดอะ มาจิเชียน",
+file:"the-magician.jpg",
+keywordsU:["ลงมือทำ","ทักษะ","ความสามารถ","โอกาส"],
+keywordsR:["ติดขัด","ใช้ศักยภาพไม่เต็มที่","หลอกตัวเอง","ขาดโฟกัส"],
+yes:"YES",
+meaning:{
+money:"มีเครื่องมือและความสามารถในการสร้างโอกาสทางการเงิน",
+work:"เด่นเรื่องการลงมือทำ การสื่อสาร และใช้ทักษะให้เกิดผล",
+love:"สามารถสร้างความสัมพันธ์ผ่านการสื่อสารและการกระทำ",
+family:"พูดคุยอย่างชัดเจนและใช้ความสามารถแก้ปัญหา",
+future:"มีโอกาสเกิดผลจากสิ่งที่กำลังลงมือทำ",
+overall:"ศักยภาพอยู่ในมือ ต้องเปลี่ยนความคิดให้เป็นการกระทำ"
+}
+},
+
+{
+id:"major-02",
+number:2,
+name:"The High Priestess",
+pron:"เดอะ ไฮ พรีสเทส",
+file:"the-high-priestess.jpg",
+keywordsU:["สัญชาตญาณ","ความเงียบ","ข้อมูลภายใน","รอ"],
+keywordsR:["สับสน","เก็บข้อมูลมากเกินไป","ไม่ฟังตัวเอง"],
+yes:"MAYBE",
+meaning:{
+money:"ควรดูข้อมูลให้ครบก่อนตัดสินใจทางการเงิน",
+work:"เหมาะกับการสังเกตและเก็บข้อมูลมากกว่าการเร่งทำ",
+love:"มีความรู้สึกบางอย่างที่ยังไม่ได้พูดออกมา",
+family:"รับฟังและสังเกตบรรยากาศก่อนตอบโต้",
+future:"ยังมีข้อมูลที่ไม่เปิดเผย จึงควรรอดูสถานการณ์",
+overall:"ความเงียบและการสังเกตมีความสำคัญ"
+}
+},
+
+{
+id:"major-03",
+number:3,
+name:"The Empress",
+pron:"ดิ เอ็มเพรส",
+file:"the-empress.jpg",
+keywordsU:["อุดมสมบูรณ์","การดูแล","ความสร้างสรรค์","เติบโต"],
+keywordsR:["ละเลยตัวเอง","มากเกินไป","ชะงัก","พึ่งพา"],
+yes:"YES",
+meaning:{
+money:"มีแนวโน้มของการเติบโตและการสร้างมูลค่า",
+work:"งานสร้างสรรค์และงานที่ต้องดูแลคนมีพลัง",
+love:"ความรักที่อบอุ่น การดูแล และการเติบโต",
+family:"เน้นความอบอุ่น การดูแล และความมั่นคง",
+future:"สิ่งที่ดูแลอยู่มีโอกาสเติบโต",
+overall:"พลังแห่งการสร้าง การดูแล และความอุดมสมบูรณ์"
+}
+},
+
+{
+id:"major-04",
+number:4,
+name:"The Emperor",
+pron:"ดิ เอ็มเพอเรอร์",
+file:"the-emperor.jpg",
+keywordsU:["โครงสร้าง","ระเบียบ","อำนาจหน้าที่","มั่นคง"],
+keywordsR:["ควบคุมมากเกินไป","แข็งเกินไป","ดื้อ","ไร้ระบบ"],
+yes:"YES",
+meaning:{
+money:"ต้องใช้ระบบ งบประมาณ และวินัย",
+work:"เหมาะกับการวางระบบ รับผิดชอบ และจัดการ",
+love:"ต้องการความชัดเจนและขอบเขต",
+family:"ผู้นำครอบครัวหรือกติกามีบทบาท",
+future:"ความมั่นคงเกิดจากการวางโครงสร้าง",
+overall:"จัดระบบให้ชัด แล้วค่อยเดินหน้า"
+}
+},
+
+{
+id:"major-05",
+number:5,
+name:"The Hierophant",
+pron:"เดอะ ไฮโรแฟนต์",
+file:"the-hierophant.jpg",
+keywordsU:["การเรียนรู้","ครู","ประเพณี","หลักการ"],
+keywordsR:["คิดต่าง","ตั้งคำถาม","หลุดกรอบ","ไม่ยืดหยุ่น"],
+yes:"MAYBE",
+meaning:{
+money:"ทำตามหลักการและระบบที่พิสูจน์แล้ว",
+work:"เรียนรู้จากผู้มีประสบการณ์หรือระบบองค์กร",
+love:"ความสัมพันธ์ที่ให้ความสำคัญกับค่านิยมและข้อตกลง",
+family:"ประเพณี ค่านิยม หรือผู้ใหญ่มีอิทธิพล",
+future:"ความรู้หรือคำแนะนำจากผู้มีประสบการณ์มีประโยชน์",
+overall:"เรียนรู้จากระบบ ครู และหลักการที่ชัดเจน"
+}
+},
+
+{
+id:"major-06",
+number:6,
+name:"The Lovers",
+pron:"เดอะ เลิฟเวอร์ส",
+file:"the-lovers.jpg",
+keywordsU:["ความสัมพันธ์","ทางเลือก","คุณค่า","การตัดสินใจ"],
+keywordsR:["ไม่ลงรอย","ลังเล","ทางเลือกขัดกัน","คุณค่าไม่ตรง"],
+yes:"YES",
+meaning:{
+money:"ต้องเลือกทางที่สอดคล้องกับคุณค่าของตัวเอง",
+work:"การร่วมมือและการตัดสินใจมีความสำคัญ",
+love:"ความสัมพันธ์และการเลือกจากใจอย่างมีสติ",
+family:"ความเข้าใจและการสื่อสารระหว่างคนสำคัญ",
+future:"จะมีทางเลือกที่ต้องตัดสินใจ",
+overall:"เลือกสิ่งที่ตรงกับคุณค่าและความตั้งใจจริง"
+}
+},
+
+{
+id:"major-07",
+number:7,
+name:"The Chariot",
+pron:"เดอะ แชริออต",
+file:"the-chariot.jpg",
+keywordsU:["เดินหน้า","ควบคุมทิศทาง","ชัยชนะ","วินัย"],
+keywordsR:["เสียทิศทาง","รีบเกินไป","ควบคุมไม่ได้","ลังเล"],
+yes:"YES",
+meaning:{
+money:"ต้องคุมงบและทิศทางอย่างจริงจัง",
+work:"เดินหน้าด้วยวินัยและเป้าหมายชัด",
+love:"ความสัมพันธ์เดินหน้าได้หากทั้งสองฝ่ายรู้ทิศทาง",
+family:"อย่าให้ความขัดแย้งแย่งทิศทางของครอบครัว",
+future:"มีแรงผลักดันให้เดินหน้า",
+overall:"กำหนดทิศทางแล้วควบคุมแรงของตัวเอง"
+}
+},
+
+{
+id:"major-08",
+number:8,
+name:"Strength",
+pron:"สเตร็งธ์",
+file:"strength.jpg",
+keywordsU:["ความอดทน","ความนุ่มนวล","ใจแข็งแรง","ควบคุมอารมณ์"],
+keywordsR:["หมดแรง","ไม่มั่นใจ","อารมณ์นำ","กดตัวเอง"],
+yes:"YES",
+meaning:{
+money:"อดทนและควบคุมการใช้จ่าย",
+work:"ใช้ความนิ่งและความอดทนแก้สถานการณ์",
+love:"ความอ่อนโยนและความเข้าใจสำคัญกว่าการเอาชนะ",
+family:"ใช้ความใจเย็นแทนการปะทะ",
+future:"ค่อย ๆ แข็งแรงขึ้นจากประสบการณ์",
+overall:"พลังที่แท้จริงมาจากการควบคุมตัวเอง"
+}
+},
+
+{
+id:"major-09",
+number:9,
+name:"The Hermit",
+pron:"เดอะ เฮอร์มิท",
+file:"the-hermit.jpg",
+keywordsU:["ค้นหาคำตอบ","อยู่กับตัวเอง","ทบทวน","ปัญญา"],
+keywordsR:["แยกตัวมากเกินไป","หลงทาง","ปิดตัว"],
+yes:"MAYBE",
+meaning:{
+money:"ทบทวนแผนและตรวจข้อมูลก่อนตัดสินใจ",
+work:"เหมาะกับงานที่ต้องใช้สมาธิและความเชี่ยวชาญ",
+love:"ต้องการพื้นที่ทบทวนความรู้สึก",
+family:"อาจต้องมีพื้นที่ส่วนตัวเพื่อคิดให้ชัด",
+future:"คำตอบจะชัดขึ้นเมื่อมีเวลาทบทวน",
+overall:"ถอยออกมามองภาพรวมก่อนเดินต่อ"
+}
+},
+
+{
+id:"major-10",
+number:10,
+name:"Wheel of Fortune",
+pron:"วีล ออฟ ฟอร์จูน",
+file:"wheel-of-fortune.jpg",
+keywordsU:["การเปลี่ยนแปลง","จังหวะ","โอกาส","วงจร"],
+keywordsR:["ติดวงจรเดิม","จังหวะไม่ลงตัว","ต่อต้านการเปลี่ยน"],
+yes:"MAYBE",
+meaning:{
+money:"จังหวะทางการเงินเปลี่ยนได้ ควรปรับตัว",
+work:"สถานการณ์งานอาจเปลี่ยนเร็ว",
+love:"ความสัมพันธ์เข้าสู่วงจรใหม่",
+family:"เหตุการณ์ภายนอกอาจทำให้ต้องปรับตัว",
+future:"มีการเปลี่ยนแปลงที่ไม่ควบคุมได้ทั้งหมด",
+overall:"ยอมรับการเปลี่ยนแปลงและดูจังหวะ"
+}
+},
+
+{
+id:"major-11",
+number:11,
+name:"Justice",
+pron:"จัสทิส",
+file:"justice.jpg",
+keywordsU:["ความยุติธรรม","ข้อเท็จจริง","ความรับผิดชอบ","สมดุล"],
+keywordsR:["ไม่สมดุล","ข้อมูลไม่ครบ","ผลจากการตัดสินใจ"],
+yes:"YES",
+meaning:{
+money:"ตรวจตัวเลข สัญญา และความรับผิดชอบ",
+work:"ใช้ข้อเท็จจริงและหลักเกณฑ์ในการตัดสินใจ",
+love:"ความสัมพันธ์ต้องมีความชัดเจนและเป็นธรรม",
+family:"คุยกันด้วยเหตุผลและความเป็นธรรม",
+future:"ผลลัพธ์สัมพันธ์กับการตัดสินใจและข้อมูล",
+overall:"ดูข้อเท็จจริงก่อนความรู้สึก"
+}
+},
+
+{
+id:"major-12",
+number:12,
+name:"The Hanged Man",
+pron:"เดอะ แฮงด์ แมน",
+file:"the-hanged-man.jpg",
+keywordsU:["หยุด","มุมมองใหม่","เสียสละ","รอ"],
+keywordsR:["ค้าง","ไม่ยอมเปลี่ยนมุมมอง","เสียเวลา"],
+yes:"MAYBE",
+meaning:{
+money:"ยังไม่ควรรีบตัดสินใจ อาจต้องเปลี่ยนมุมมอง",
+work:"หยุดดูวิธีทำงานใหม่ก่อนเดินหน้า",
+love:"ต้องให้เวลาและมองสถานการณ์จากอีกด้าน",
+family:"การถอยหนึ่งก้าวอาจช่วยให้เห็นปัญหาชัด",
+future:"บางเรื่องต้องรอก่อนจึงเห็นทาง",
+overall:"หยุดเพื่อมองสิ่งเดิมด้วยมุมใหม่"
+}
+},
+
+{
+id:"major-13",
+number:13,
+name:"Death",
+pron:"เดธ",
+file:"death.jpg",
+keywordsU:["จบวงจร","เปลี่ยนผ่าน","ปล่อยของเดิม","เริ่มใหม่"],
+keywordsR:["ยึดติด","เปลี่ยนช้า","ไม่ยอมปล่อย"],
+yes:"MAYBE",
+meaning:{
+money:"ควรปิดรูปแบบเดิมที่ไม่ตอบโจทย์และปรับใหม่",
+work:"มีการเปลี่ยนบทบาทหรือวิธีทำงาน",
+love:"ความสัมพันธ์หรือรูปแบบเดิมต้องเปลี่ยน",
+family:"วงจรเดิมบางอย่างกำลังเปลี่ยน",
+future:"การเปลี่ยนผ่านเปิดพื้นที่ให้สิ่งใหม่",
+overall:"ไม่ใช่ความหมายเรื่องความตายโดยตรง แต่เน้นการเปลี่ยนผ่าน"
+}
+},
+
+{
+id:"major-14",
+number:14,
+name:"Temperance",
+pron:"เทมเพอแรนซ์",
+file:"temperance.jpg",
+keywordsU:["สมดุล","ประสาน","พอดี","ค่อยเป็นค่อยไป"],
+keywordsR:["สุดโต่ง","ไม่สมดุล","รีบ","ผสมไม่ลงตัว"],
+yes:"YES",
+meaning:{
+money:"จัดสมดุลรายรับรายจ่าย",
+work:"ประสานคนและขั้นตอนให้ลงตัว",
+love:"ความสัมพันธ์ต้องอาศัยความพอดี",
+family:"ประนีประนอมและหาจุดกลาง",
+future:"ค่อย ๆ ดีขึ้นจากการปรับสมดุล",
+overall:"ไม่ต้องสุดโต่ง ใช้จังหวะที่พอดี"
+}
+},
+
+{
+id:"major-15",
+number:15,
+name:"The Devil",
+pron:"เดอะ เดวิล",
+file:"the-devil.jpg",
+keywordsU:["พันธะ","ความอยาก","สิ่งล่อใจ","ติดอยู่"],
+keywordsR:["เห็นพันธะ","ปล่อยได้","ตระหนักรู้","หลุดจากวงจร"],
+yes:"NO",
+meaning:{
+money:"ระวังหนี้ การใช้จ่ายตามอารมณ์ หรือเงื่อนไขที่ผูกมัด",
+work:"ระวังสภาพแวดล้อมที่ทำให้รู้สึกติดอยู่",
+love:"ความผูกพันแรง ความหึงหวง หรือรูปแบบที่ไม่สมดุล",
+family:"ระวังการควบคุมหรือความคาดหวังมากเกินไป",
+future:"ต้องมองสิ่งที่กำลังผูกมัดตัวเอง",
+overall:"สำรวจสิ่งที่เรายอมให้มีอำนาจเหนือการตัดสินใจ"
+}
+},
+
+{
+id:"major-16",
+number:16,
+name:"The Tower",
+pron:"เดอะ ทาวเวอร์",
+file:"the-tower.jpg",
+keywordsU:["เปลี่ยนฉับพลัน","รื้อของเดิม","ความจริงเปิดเผย","ปลดล็อก"],
+keywordsR:["ต้านการเปลี่ยน","ความตึงเครียดสะสม","ชะลอการเปลี่ยน"],
+yes:"NO",
+meaning:{
+money:"ควรเตรียมรับการเปลี่ยนแปลงกะทันหัน",
+work:"โครงสร้างหรือแผนเดิมอาจต้องปรับอย่างรวดเร็ว",
+love:"ความจริงบางอย่างอาจทำให้ต้องทบทวน",
+family:"ความตึงเครียดควรได้รับการพูดอย่างตรงไปตรงมา",
+future:"มีเหตุการณ์ที่ผลักให้เปลี่ยนแนวทาง",
+overall:"สิ่งที่ไม่มั่นคงอาจถูกเปิดให้เห็นชัด"
+}
+},
+
+{
+id:"major-17",
+number:17,
+name:"The Star",
+pron:"เดอะ สตาร์",
+file:"the-star.jpg",
+keywordsU:["ความหวัง","ฟื้นตัว","แรงบันดาลใจ","ความชัดเจน"],
+keywordsR:["หมดหวัง","คาดหวังสูง","หมดแรง"],
+yes:"YES",
+meaning:{
+money:"มีความหวังและโอกาสฟื้นตัว",
+work:"แรงบันดาลใจและวิสัยทัศน์ช่วยให้งานเดินหน้า",
+love:"ความสัมพันธ์มีพื้นที่ให้เยียวยาและเปิดใจ",
+family:"บรรยากาศค่อย ๆ เบาลง",
+future:"มีทิศทางที่น่าหวัง",
+overall:"รักษาความหวังและทำสิ่งที่สอดคล้องกับตัวเอง"
+}
+},
+
+{
+id:"major-18",
+number:18,
+name:"The Moon",
+pron:"เดอะ มูน",
+file:"the-moon.jpg",
+keywordsU:["ความไม่แน่นอน","ความรู้สึก","สิ่งไม่ชัด","จินตนาการ"],
+keywordsR:["ความจริงเริ่มชัด","คลายความสับสน","เห็นภาพมากขึ้น"],
+yes:"MAYBE",
+meaning:{
+money:"อย่าตัดสินใจจากข้อมูลที่ยังไม่ชัด",
+work:"ตรวจข้อมูลและอย่าด่วนสรุป",
+love:"ความรู้สึกมีมากกว่าข้อเท็จจริงที่เห็น",
+family:"อาจมีเรื่องที่แต่ละคนเข้าใจไม่เหมือนกัน",
+future:"ยังมีความไม่แน่นอน ต้องรอข้อมูลเพิ่ม",
+overall:"แยกความรู้สึกออกจากข้อเท็จจริง"
+}
+},
+
+{
+id:"major-19",
+number:19,
+name:"The Sun",
+pron:"เดอะ ซัน",
+file:"the-sun.jpg",
+keywordsU:["ความสำเร็จ","ความชัดเจน","ความสุข","พลัง"],
+keywordsR:["ล่าช้า","มั่นใจเกินไป","ความสุขไม่เต็มที่"],
+yes:"YES",
+meaning:{
+money:"สถานการณ์มีความชัดเจนและมีโอกาสเติบโต",
+work:"ผลงานได้รับการมองเห็น",
+love:"ความสัมพันธ์เปิดเผยและอบอุ่น",
+family:"บรรยากาศสดใสและสื่อสารกันง่าย",
+future:"มีแนวโน้มของความชัดเจนและความก้าวหน้า",
+overall:"ความชัดเจน ความสำเร็จ และพลังบวก"
+}
+},
+
+{
+id:"major-20",
+number:20,
+name:"Judgement",
+pron:"จัดจ์เมนต์",
+file:"judgement.jpg",
+keywordsU:["ทบทวน","ตื่นรู้","ตัดสินใจ","เริ่มบทใหม่"],
+keywordsR:["ลังเล","ไม่ยอมรับบทเรียน","ติดอดีต"],
+yes:"YES",
+meaning:{
+money:"ทบทวนการตัดสินใจทางการเงินที่ผ่านมา",
+work:"ได้รับโอกาสประเมินผลงานหรือเริ่มบทใหม่",
+love:"กลับมาทบทวนสิ่งที่เรียนรู้จากความสัมพันธ์",
+family:"เรื่องเก่าต้องได้รับการพูดและทำความเข้าใจ",
+future:"กำลังเข้าสู่ช่วงตัดสินใจสำคัญ",
+overall:"นำบทเรียนเดิมมาใช้กับการตัดสินใจครั้งใหม่"
+}
+},
+
+{
+id:"major-21",
+number:21,
+name:"The World",
+pron:"เดอะ เวิลด์",
+file:"the-world.jpg",
+keywordsU:["ครบวงจร","สำเร็จ","ปิดงาน","ก้าวต่อ"],
+keywordsR:["งานค้าง","ยังไม่จบ","วนกลับมาแก้"],
+yes:"YES",
+meaning:{
+money:"เห็นผลจากสิ่งที่ทำมาและปิดวงจรได้",
+work:"งานมีโอกาสสำเร็จหรือจบเป็นชิ้นเป็นอัน",
+love:"ความสัมพันธ์เข้าใจภาพรวมและสถานะชัด",
+family:"วงจรบางอย่างกำลังคลี่คลาย",
+future:"จบขั้นหนึ่งเพื่อไปสู่ขั้นใหม่",
+overall:"ครบวงจรและพร้อมก้าวไปขั้นต่อไป"
+}
+}
+];
+
+
+/* =========================================================
+   MINOR ARCANA
+========================================================= */
+
+const SUITS = {
+  wands:{
+    name:"Wands",
+    thai:"แวนด์ส",
+    domain:"แรงผลักดัน การลงมือทำ ความคิดริเริ่ม",
+    file:"wands"
+  },
+  cups:{
+    name:"Cups",
+    thai:"คัพ",
+    domain:"อารมณ์ ความสัมพันธ์ ความรู้สึก",
+    file:"cups"
+  },
+  swords:{
+    name:"Swords",
+    thai:"ซอร์ดส์",
+    domain:"ความคิด การสื่อสาร การตัดสินใจ",
+    file:"swords"
+  },
+  pentacles:{
+    name:"Pentacles",
+    thai:"เพนทะเคิลส์",
+    domain:"เงิน งาน ทรัพย์สิน ความมั่นคง",
+    file:"pentacles"
+  }
+};
+
+const RANKS = [
+  {key:"ace",name:"Ace",pron:"เอซ",meaning:"จุดเริ่มต้น โอกาส หรือพลังใหม่"},
+  {key:"two",name:"Two",pron:"ทู",meaning:"การเลือก สมดุล หรือการประสานสองด้าน"},
+  {key:"three",name:"Three",pron:"ทรี",meaning:"การร่วมมือ การพัฒนา และการสร้างต่อ"},
+  {key:"four",name:"Four",pron:"โฟร์",meaning:"ความมั่นคง การพัก หรือการรักษาสิ่งที่มี"},
+  {key:"five",name:"Five",pron:"ไฟฟ์",meaning:"ความท้าทาย ความขัดแย้ง หรือการปรับตัว"},
+  {key:"six",name:"Six",pron:"ซิกซ์",meaning:"การแลกเปลี่ยน การฟื้นตัว หรือการเคลื่อนต่อ"},
+  {key:"seven",name:"Seven",pron:"เซเว่น",meaning:"การประเมิน การทดสอบ หรือการยืนหยัด"},
+  {key:"eight",name:"Eight",pron:"เอท",meaning:"การเคลื่อนไหว การฝึกฝน หรือความก้าวหน้า"},
+  {key:"nine",name:"Nine",pron:"ไนน์",meaning:"ผลจากประสบการณ์ ความอดทน หรือความพร้อม"},
+  {key:"ten",name:"Ten",pron:"เท็น",meaning:"บทสรุป ภาระ หรือผลรวมของวงจร"},
+  {key:"page",name:"Page",pron:"เพจ",meaning:"การเรียนรู้ ข่าวสาร และการเริ่มฝึก"},
+  {key:"knight",name:"Knight",pron:"ไนท์",meaning:"การลงมือ ความเคลื่อนไหว และแรงขับ"},
+  {key:"queen",name:"Queen",pron:"ควีน",meaning:"ความเข้าใจภายใน การจัดการ และความเป็นผู้ใหญ่"},
+  {key:"king",name:"King",pron:"คิง",meaning:"ความรับผิดชอบ การควบคุม และความชำนาญ"}
+];
+
+const MINOR_SPECIAL = {
+  wands:{
+    ace:["โอกาสใหม่","แรงบันดาลใจ","ลงมือ"],
+    two:["วางแผน","มองอนาคต","เลือกทิศทาง"],
+    three:["ขยายงาน","รอผล","เติบโต"],
+    four:["ฉลอง","ฐานมั่นคง","บ้าน"],
+    five:["แข่งขัน","ขัดแย้ง","ท้าทาย"],
+    six:["สำเร็จ","ได้รับการยอมรับ","ข่าวดี"],
+    seven:["ยืนหยัด","ปกป้องจุดยืน","แข่งขัน"],
+    eight:["รวดเร็ว","ข่าวสาร","เคลื่อนไหว"],
+    nine:["อดทน","เตรียมพร้อม","ระวัง"],
+    ten:["ภาระ","รับผิดชอบมาก","แบกงาน"],
+    page:["ข่าวใหม่","เรียนรู้","อยากลอง"],
+    knight:["ลุย","กล้า","รวดเร็ว"],
+    queen:["มั่นใจ","สร้างสรรค์","เป็นตัวเอง"],
+    king:["ผู้นำ","วิสัยทัศน์","ตัดสินใจ"]
+  },
+  cups:{
+    ace:["ความรู้สึกใหม่","ความรัก","เปิดใจ"],
+    two:["ความสัมพันธ์","การตกลง","คู่"],
+    three:["มิตรภาพ","ฉลอง","สังคม"],
+    four:["เบื่อ","ไม่สนใจ","ทบทวน"],
+    five:["เสียใจ","เสียดาย","มองสิ่งที่หาย"],
+    six:["อดีต","ความทรงจำ","ความอบอุ่น"],
+    seven:["ตัวเลือก","จินตนาการ","สับสน"],
+    eight:["เดินออกมา","ค้นหาความหมาย","ปล่อย"],
+    nine:["สมหวัง","พอใจ","ความต้องการ"],
+    ten:["ครอบครัว","ความสุข","ความสัมพันธ์มั่นคง"],
+    page:["ข่าวความรู้สึก","อ่อนโยน","เริ่มเปิดใจ"],
+    knight:["โรแมนติก","ข้อเสนอ","แสดงความรู้สึก"],
+    queen:["เข้าใจความรู้สึก","เมตตา","สัญชาตญาณ"],
+    king:["ควบคุมอารมณ์","วุฒิภาวะ","ใจนิ่ง"]
+  },
+  swords:{
+    ace:["ความชัดเจน","ความจริง","ตัดสินใจ"],
+    two:["ลังเล","สองทาง","ยังไม่เลือก"],
+    three:["ผิดหวัง","คำพูดเจ็บ","แยกทาง"],
+    four:["พัก","หยุดคิด","ฟื้นตัว"],
+    five:["ขัดแย้ง","เอาชนะ","ผลกระทบ"],
+    six:["เคลื่อนออก","เปลี่ยนสภาพแวดล้อม","ค่อยดีขึ้น"],
+    seven:["วางแผน","เก็บข้อมูล","ระวัง"],
+    eight:["รู้สึกติด","ข้อจำกัด","ความคิด"],
+    nine:["กังวล","คิดมาก","นอนไม่หลับ"],
+    ten:["จบวงจร","หนักถึงจุดสูงสุด","ปล่อย"],
+    page:["ข่าวสาร","สังเกต","เรียนรู้"],
+    knight:["เร็ว","ตรง","คิดแล้วทำ"],
+    queen:["ชัดเจน","เหตุผล","ขอบเขต"],
+    king:["หลักการ","ตัดสินใจ","อำนาจทางความคิด"]
+  },
+  pentacles:{
+    ace:["โอกาสเงิน","งานใหม่","ทรัพย์สิน"],
+    two:["จัดสมดุลเงิน","หลายเรื่อง","บริหาร"],
+    three:["ฝีมือ","ร่วมงาน","สร้างคุณค่า"],
+    four:["เก็บรักษา","ความมั่นคง","ระวังยึดติด"],
+    five:["ขาดแคลน","กังวลเงิน","ต้องการความช่วยเหลือ"],
+    six:["ให้และรับ","ช่วยเหลือ","สมดุล"],
+    seven:["รอผล","ลงทุนเวลา","ประเมิน"],
+    eight:["ฝึกฝน","ทำซ้ำ","พัฒนาทักษะ"],
+    nine:["พึ่งตัวเอง","ผลตอบแทน","มั่นคง"],
+    ten:["ทรัพย์สิน","ครอบครัว","ระยะยาว"],
+    page:["เรียนรู้เรื่องเงิน","ทักษะ","โอกาส"],
+    knight:["ขยัน","สม่ำเสมอ","รับผิดชอบ"],
+    queen:["จัดการทรัพย์สิน","ดูแล","มั่นคง"],
+    king:["ความมั่งคั่ง","บริหาร","ความรับผิดชอบ"]
+  }
+};
+
+function makeMinorCards(){
+
+  const result=[];
+
+  Object.entries(SUITS).forEach(([suitKey,suit])=>{
+
+    RANKS.forEach((rank,index)=>{
+
+      const special=MINOR_SPECIAL[suitKey][rank.key];
+
+      let yes="MAYBE";
+
+      if(
+        ["ace","three","six","eight","nine","king","queen"].includes(rank.key)
+      ){
+        yes="YES";
+      }
+
+      if(
+        suitKey==="swords" &&
+        ["three","five","nine","ten"].includes(rank.key)
+      ){
+        yes="NO";
+      }
+
+      const keywordsU=[
+        ...special,
+        suit.domain
+      ];
+
+      const keywordsR=[
+        "ติดขัด",
+        "มากเกินไป",
+        "ทบทวน",
+        special[0]
+      ];
+
+      const fieldBase =
+        suitKey==="pentacles"
+          ? "เรื่องเงิน งาน ทรัพย์สิน และความมั่นคง"
+          : suitKey==="cups"
+            ? "เรื่องความรู้สึก ความสัมพันธ์ และการเชื่อมโยง"
+            : suitKey==="swords"
+              ? "เรื่องความคิด การสื่อสาร และการตัดสินใจ"
+              : "เรื่องแรงผลักดัน การลงมือทำ และเป้าหมาย";
+
+      const meaning={
+        money:
+          suitKey==="pentacles"
+            ? `${rank.meaning} โดยเน้นเรื่องเงิน งาน หรือทรัพย์สิน`
+            : `${rank.meaning} เมื่อนำมาใช้กับเรื่องเงิน ควรดูจังหวะและการตัดสินใจให้รอบคอบ`,
+
+        work:
+          suitKey==="wands"
+            ? `${rank.meaning} ในงาน เน้นแรงผลักดันและการลงมือ`
+            : suitKey==="pentacles"
+              ? `${rank.meaning} ในงาน เน้นทักษะ ความสม่ำเสมอ และผลลัพธ์`
+              : `${rank.meaning} ในงาน โดยพิจารณาการสื่อสารและคนที่เกี่ยวข้อง`,
+
+        love:
+          suitKey==="cups"
+            ? `${rank.meaning} ในความรัก เน้นความรู้สึกและความสัมพันธ์`
+            : `${rank.meaning} ในความรัก ควรสื่อสารให้ชัดและดูการกระทำประกอบ`,
+
+        family:
+          `ในครอบครัว ไพ่เน้น${suit.domain} และวิธีจัดการสถานการณ์ตามความหมายของไพ่`,
+
+        future:
+          `อนาคตอาจนำไปสู่${rank.meaning} โดย${fieldBase}`,
+
+        overall:
+          `${rank.meaning} ผสมกับพลังของ${suit.name} — ${suit.domain}`
+      };
+
+      result.push({
+        id:`${suitKey}-${rank.key}`,
+        number:22 + Object.keys(SUITS).indexOf(suitKey)*14 + index + 1,
+        name:`${rank.name} of ${suit.name}`,
+        pron:`${rank.pron} ออฟ ${suit.thai}`,
+        file:`${rank.key}-of-${suitKey}.jpg`,
+        suit:suitKey,
+        rank:rank.key,
+        keywordsU,
+        keywordsR,
+        yes,
+        meaning
+      });
+
+    });
+
+  });
+
+  return result;
+}
+
+const CARDS=[
+  ...MAJOR.map(c=>({...c,type:"major"})),
+  ...makeMinorCards().map(c=>({...c,type:"minor"}))
+];
+
+
+/* =========================================================
+   SPREADS
+========================================================= */
+
+const SPREADS={
+
+  one:{
+    name:"1 ใบ",
+    board:"one",
+    positions:[
+      {name:"ไพ่หลัก",meaning:"ประเด็นหลัก / แนวทางสำคัญ"}
+    ]
+  },
+
+  three:{
+    name:"3 ใบ",
+    board:"three",
+    positions:[
+      {name:"อดีต",meaning:"สิ่งที่นำมาสู่สถานการณ์"},
+      {name:"ปัจจุบัน",meaning:"สถานการณ์ที่กำลังเกิดขึ้น"},
+      {name:"อนาคต",meaning:"แนวโน้มถัดไป"}
+    ]
+  },
+
+  five:{
+    name:"5 ใบ",
+    board:"five",
+    positions:[
+      {name:"ภาพรวม",meaning:"แก่นของเรื่อง"},
+      {name:"สิ่งที่ต้องดู",meaning:"ปัจจัยสำคัญ"},
+      {name:"สิ่งสนับสนุน",meaning:"สิ่งที่ช่วย"},
+      {name:"สิ่งขัดขวาง",meaning:"สิ่งที่ต้องระวัง"},
+      {name:"แนวทาง",meaning:"สิ่งที่ควรโฟกัส"}
+    ]
+  },
+
+  seven:{
+    name:"7 ใบ",
+    board:"seven",
+    positions:[
+      {name:"จุดเริ่มต้น",meaning:"ต้นเหตุ"},
+      {name:"สถานการณ์",meaning:"สิ่งที่เกิดขึ้น"},
+      {name:"สิ่งที่รู้",meaning:"สิ่งที่เห็นชัด"},
+      {name:"สิ่งที่ซ่อนอยู่",meaning:"ปัจจัยที่ยังไม่ชัด"},
+      {name:"อิทธิพล",meaning:"สิ่งที่กำลังส่งผล"},
+      {name:"คำแนะนำ",meaning:"สิ่งที่ควรทำ"},
+      {name:"แนวโน้ม",meaning:"ทิศทางถัดไป"}
+    ]
+  },
+
+  ten:{
+    name:"10 ใบ",
+    board:"cross",
+    positions:[
+      {name:"ปัจจุบัน",meaning:"หัวใจของสถานการณ์"},
+      {name:"อุปสรรค",meaning:"สิ่งที่ขวางอยู่"},
+      {name:"รากฐาน",meaning:"พื้นฐานของเรื่อง"},
+      {name:"อดีตที่ผ่านมา",meaning:"อิทธิพลจากอดีต"},
+      {name:"สิ่งที่อยู่ในใจ",meaning:"เป้าหมายหรือความคิด"},
+      {name:"อนาคตใกล้",meaning:"สิ่งที่กำลังเข้ามา"},
+      {name:"ตัวคุณ",meaning:"ท่าทีของคุณ"},
+      {name:"สภาพแวดล้อม",meaning:"คนหรือสถานการณ์รอบตัว"},
+      {name:"ความหวัง/ความกลัว",meaning:"สิ่งที่คาดหวังหรือกังวล"},
+      {name:"ผลลัพธ์",meaning:"แนวโน้มของภาพรวม"}
+    ]
+  },
+
+  houses:{
+    name:"12 Houses",
+    board:"houses",
+    positions:[
+      {name:"เรือนที่ 1",meaning:"ตัวตน บุคลิก และภาพที่แสดงออก"},
+      {name:"เรือนที่ 2",meaning:"เงิน ทรัพย์สิน คุณค่า"},
+      {name:"เรือนที่ 3",meaning:"การสื่อสาร การเรียนรู้ สภาพแวดล้อมใกล้ตัว"},
+      {name:"เรือนที่ 4",meaning:"บ้าน ครอบครัว รากฐาน"},
+      {name:"เรือนที่ 5",meaning:"ความรัก ความสร้างสรรค์ ความสนุก"},
+      {name:"เรือนที่ 6",meaning:"งานประจำ สุขภาพ กิจวัตร"},
+      {name:"เรือนที่ 7",meaning:"คู่สัมพันธ์ หุ้นส่วน คนตรงข้าม"},
+      {name:"เรือนที่ 8",meaning:"ทรัพยากรร่วม การเปลี่ยนผ่าน"},
+      {name:"เรือนที่ 9",meaning:"การเดินทาง การศึกษา ความเชื่อ"},
+      {name:"เรือนที่ 10",meaning:"อาชีพ เป้าหมาย สถานะ"},
+      {name:"เรือนที่ 11",meaning:"เพื่อน เครือข่าย ความหวัง"},
+      {name:"เรือนที่ 12",meaning:"โลกภายใน สิ่งที่ซ่อนอยู่ การพัก"}
+    ]
+  }
+
+};
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let currentSpread="one";
+let activePosition=0;
+let pickerFilter="all";
+let libraryFilter="all";
+
+let reading={
+  question:"",
+  cards:[]
+};
+
+let notes=
+  JSON.parse(localStorage.getItem("tarotNotes") || "[]");
+
+
+/* =========================================================
+   INIT
+========================================================= */
+
+function init(){
+
+  renderSpreadTabs();
+
+  createEmptyReading();
+
+  renderEverything();
+
+  renderLibrary();
+
+  renderNotes();
+
+}
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function escapeHtml(value){
+
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+function getCard(id){
+
+  return CARDS.find(c=>c.id===id);
+
+}
+
+
+/* =========================================================
+   CARD IMAGE SYSTEM
+   =========================================================
+   ใช้รูป Rider-Waite-Smith จาก Wikimedia Commons
+   โดยสร้างชื่อไฟล์จาก card.name อัตโนมัติ
+
+   ไม่ต้อง:
+   - สร้างโฟลเดอร์ images
+   - ดาวน์โหลดรูป 78 ใบ
+   - ใส่ <img> 78 จุด
+   - แก้ชื่อไฟล์ใน MAJOR
+   - แก้ makeMinorCards()
+
+   รูปจะถูกใช้ทุกจุดที่เรียก imageHtml()
+========================================================= */
+
+function imagePath(card){
+
+  if(!card){
+    return "";
+  }
+
+  /*
+    ตัวอย่าง:
+
+    The Fool
+    →
+    The Fool (Rider-Waite Smith tarot deck).png
+
+    Ace of Wands
+    →
+    Ace of Wands (Rider-Waite Smith tarot deck).png
+  */
+
+  const fileName =
+    `${card.name} (Rider-Waite Smith tarot deck).png`;
+
+  return (
+    "https://commons.wikimedia.org/wiki/Special:FilePath/" +
+    encodeURIComponent(fileName) +
+    "?width=600"
+  );
+
+}
+
+
+/* =========================================================
+   SVG FALLBACK
+========================================================= */
+
+function escapeSvgText(value){
+
+  return String(value || "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&apos;");
+
+}
+
+function fallbackImage(card){
+
+  const name=
+    escapeSvgText(card?.name || "Tarot Card");
+
+  const pron=
+    escapeSvgText(card?.pron || "");
+
+  const svg=`
+
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 400 600"
+    >
+
+      <rect
+        width="400"
+        height="600"
+        rx="24"
+        fill="#eee8dd"
+      />
+
+      <rect
+        x="18"
+        y="18"
+        width="364"
+        height="564"
+        rx="20"
+        fill="#fffdf8"
+        stroke="#cfc6b8"
+        stroke-width="3"
+      />
+
+      <rect
+        x="34"
+        y="34"
+        width="332"
+        height="532"
+        rx="14"
+        fill="none"
+        stroke="#ddd6ca"
+        stroke-width="2"
+      />
+
+      <text
+        x="200"
+        y="220"
+        text-anchor="middle"
+        font-family="Arial,sans-serif"
+        font-size="23"
+        font-weight="700"
+        fill="#403a33"
+      >
+        ${name}
+      </text>
+
+      <text
+        x="200"
+        y="258"
+        text-anchor="middle"
+        font-family="Arial,sans-serif"
+        font-size="17"
+        fill="#777168"
+      >
+        ${pron}
+      </text>
+
+      <rect
+        x="145"
+        y="300"
+        width="110"
+        height="150"
+        rx="10"
+        fill="#f8f4ec"
+        stroke="#8b7b69"
+        stroke-width="4"
+      />
+
+      <rect
+        x="157"
+        y="312"
+        width="86"
+        height="126"
+        rx="6"
+        fill="none"
+        stroke="#c8bbaa"
+        stroke-width="2"
+      />
+
+      <circle
+        cx="200"
+        cy="375"
+        r="27"
+        fill="none"
+        stroke="#8b7b69"
+        stroke-width="3"
+      />
+
+      <path
+        d="M184 375 L200 359 L216 375 L200 391 Z"
+        fill="none"
+        stroke="#8b7b69"
+        stroke-width="3"
+      />
+
+      <text
+        x="200"
+        y="500"
+        text-anchor="middle"
+        font-family="Arial,sans-serif"
+        font-size="14"
+        fill="#777168"
+      >
+        Tarot Card
+      </text>
+
+      <text
+        x="200"
+        y="525"
+        text-anchor="middle"
+        font-family="Arial,sans-serif"
+        font-size="12"
+        fill="#9a9186"
+      >
+        Image unavailable
+      </text>
+
+    </svg>
+
+  `;
+
+  return(
+    "data:image/svg+xml;charset=UTF-8,"+
+    encodeURIComponent(svg)
+  );
+
+}
+
+
+/* =========================================================
+   IMAGE ERROR HANDLER
+========================================================= */
+
+function handleCardImageError(img){
+
+  if(!img){
+    return;
+  }
+
+  /*
+    ปิด onerror ก่อน
+    เพื่อป้องกัน fallback เกิด error แล้ววนซ้ำ
+  */
+
+  img.onerror=null;
+
+  const cardId=
+    img.dataset.cardId;
+
+  const card=
+    getCard(cardId);
+
+  if(!card){
+
+    img.style.display="none";
+
+    if(img.nextElementSibling){
+      img.nextElementSibling.style.display="flex";
+    }
+
+    return;
+
+  }
+
+  /*
+    เปลี่ยนเป็นภาพสำรองที่สร้างขึ้นใน browser
+  */
+
+  img.src=
+    fallbackImage(card);
+
+}
+
+
+/* =========================================================
+   IMAGE HTML
+========================================================= */
+
+function imageHtml(card,className=""){
+
+  if(!card){
+
+    return `
+      <div class="card-placeholder">
+        ยังไม่ได้เลือกไพ่
+      </div>
+    `;
+
+  }
+
+  return `
+
+    <img
+      class="${className}"
+      src="${imagePath(card)}"
+      alt="${escapeHtml(card.name)}"
+      data-card-id="${escapeHtml(card.id)}"
+      loading="lazy"
+      decoding="async"
+      onerror="handleCardImageError(this)"
+    >
+
+    <div
+      class="card-placeholder"
+      style="display:none"
+    >
+      ${escapeHtml(card.name)}
+    </div>
+
+  `;
+
+}
+
+
+/* =========================================================
+   QUESTION
+========================================================= */
+
+function questionText(){
+
+  const input=document.getElementById("questionInput");
+
+  return (input?.value || reading.question || "").trim();
+
+}
+
+function createEmptyReading(){
+
+  reading.cards=
+    SPREADS[currentSpread].positions.map(()=>({
+      cardId:null,
+      orientation:"upright"
+    }));
+
+}
+
+function randomCards(){
+
+  const pool=[...CARDS];
+
+  for(let i=pool.length-1;i>0;i--){
+
+    const j=Math.floor(Math.random()*(i+1));
+
+    [pool[i],pool[j]]=[pool[j],pool[i]];
+
+  }
+
+  return pool.slice(0,SPREADS[currentSpread].positions.length);
+
+}
+
+
+/* =========================================================
+   SPREAD UI
+========================================================= */
+
+function renderSpreadTabs(){
+
+  const el=document.getElementById("spreadTabs");
+
+  el.innerHTML=Object.entries(SPREADS).map(([key,spread])=>`
+
+    <button
+      class="${key===currentSpread?"active":""}"
+      onclick="setSpread('${key}')"
+    >
+      ${spread.name}
+    </button>
+
+  `).join("");
+
+}
+
+function setSpread(key){
+
+  currentSpread=key;
+
+  activePosition=0;
+
+  createEmptyReading();
+
+  renderSpreadTabs();
+
+  renderEverything();
+
+}
+
+function renderEverything(){
+
+  renderBoard();
+
+  renderPositions();
+
+  renderPicker();
+
+  renderSelectedCard();
+
+  updateQuestionPreview();
+
+  document.getElementById("cardCount").textContent=
+    `${reading.cards.filter(x=>x.cardId).length} / ${reading.cards.length} ใบ`;
+
+  document.getElementById("boardTitle").textContent=
+    `${SPREADS[currentSpread].name} — กระดานไพ่`;
+
+}
+
+
+/* =========================================================
+   BOARD
+========================================================= */
+
+function renderBoard(){
+
+  const board=document.getElementById("board");
+
+  const spread=SPREADS[currentSpread];
+
+  board.className=`board ${spread.board}`;
+
+  board.innerHTML=spread.positions.map((pos,index)=>{
+
+    const item=reading.cards[index];
+
+    const card=item.cardId ? getCard(item.cardId) : null;
+
+    return `
+
+      <div
+        class="slot
+          ${activePosition===index?"selected":""}
+          ${!card?"empty":""}
+          ${item.orientation==="reversed"?"reversed":""}"
+        onclick="selectPosition(${index})"
+      >
+
+        <div class="slot-number">
+          ${index+1}
+        </div>
+
+        ${
+          card
+          ? imageHtml(card)
+          : `<div style="font-size:25px">＋</div>`
+        }
+
+        <div class="slot-name">
+          ${card
+            ? escapeHtml(card.name)
+            : escapeHtml(pos.name)
+          }
+        </div>
+
+        ${
+          card
+          ? `<div class="orientation">
+               ${item.orientation==="reversed"?"กลับหัว":"หงาย"}
+             </div>`
+          : ""
+        }
+
+      </div>
+
+    `;
+
+  }).join("");
+
+}
+
+
+/* =========================================================
+   POSITIONS
+========================================================= */
+
+function renderPositions(){
+
+  const el=document.getElementById("positionList");
+
+  el.innerHTML=SPREADS[currentSpread].positions.map((pos,index)=>{
+
+    const item=reading.cards[index];
+
+    const card=item.cardId ? getCard(item.cardId) : null;
+
+    return `
+
+      <div
+        class="position-item ${activePosition===index?"active":""}"
+        onclick="selectPosition(${index})"
+      >
+
+        <div class="position-top">
+
+          <div>
+
+            <div class="position-name">
+              ${index+1}. ${escapeHtml(pos.name)}
+            </div>
+
+            <div class="position-meaning">
+              ${escapeHtml(pos.meaning)}
+            </div>
+
+          </div>
+
+          <div class="mini-meta">
+            ${card
+              ? item.orientation==="reversed"
+                ? "กลับหัว"
+                : "หงาย"
+              : "ยังว่าง"}
+          </div>
+
+        </div>
+
+        ${
+          card
+          ? `<div class="position-card">
+               🃏 ${escapeHtml(card.name)}
+               — ${escapeHtml(card.pron)}
+             </div>`
+          : ""
+        }
+
+      </div>
+
+    `;
+
+  }).join("");
+
+}
+
+function selectPosition(index){
+
+  activePosition=index;
+
+  renderEverything();
+
+}
+
+
+/* =========================================================
+   CARD PICKER
+========================================================= */
+
+function setPickerFilter(filter,button){
+
+  pickerFilter=filter;
+
+  document.querySelectorAll(".filter-row .filter-btn")
+    .forEach(btn=>{
+      if(btn.closest(".panel")?.querySelector("#cardPicker")){
+        btn.classList.remove("active");
+      }
+    });
+
+  if(button){
+    button.classList.add("active");
+  }
+
+  renderPicker();
+
+}
+
+function renderPicker(){
+
+  const el=document.getElementById("cardPicker");
+
+  let cards=CARDS;
+
+  if(pickerFilter==="major"){
+    cards=CARDS.filter(c=>c.type==="major");
+  }
+
+  if(["wands","cups","swords","pentacles"].includes(pickerFilter)){
+    cards=CARDS.filter(c=>c.suit===pickerFilter);
+  }
+
+  el.innerHTML=cards.map(card=>{
+
+    const selected=
+      reading.cards.some(x=>x.cardId===card.id);
+
+    return `
+
+      <button
+        class="picker-card ${selected?"selected":""}"
+        onclick="chooseCard('${card.id}')"
+      >
+
+        ${imageHtml(card)}
+
+        <div class="picker-card-name">
+          ${escapeHtml(card.name)}
+        </div>
+
+      </button>
+
+    `;
+
+  }).join("");
+
+}
+
+function chooseCard(cardId){
+
+  reading.cards[activePosition]={
+    cardId,
+    orientation:"upright"
+  };
+
+  renderEverything();
+
+}
+
+
+/* =========================================================
+   ORIENTATION
+========================================================= */
+
+function setOrientation(value){
+
+  if(!reading.cards[activePosition]){
+    return;
+  }
+
+  reading.cards[activePosition].orientation=value;
+
+  document.getElementById("uprightBtn")
+    .classList.toggle("active",value==="upright");
+
+  document.getElementById("reversedBtn")
+    .classList.toggle("active",value==="reversed");
+
+  renderEverything();
+
+}
+
+
+/* =========================================================
+   SELECTED CARD
+========================================================= */
+
+function renderSelectedCard(){
+
+  const el=document.getElementById("selectedCard");
+
+  const item=reading.cards[activePosition];
+
+  const card=item?.cardId ? getCard(item.cardId) : null;
+
+  if(!card){
+
+    el.innerHTML=`
+      <div class="empty-state">
+        เลือกตำแหน่ง แล้วเลือกไพ่จากด้านล่าง
+      </div>
+    `;
+
+    return;
+
+  }
+
+  const keywords=
+    item.orientation==="reversed"
+      ? card.keywordsR
+      : card.keywordsU;
+
+  el.innerHTML=`
+
+    <div class="selected-card">
+
+      <div>
+        ${imageHtml(card)}
+      </div>
+
+      <div>
+
+        <h3>${escapeHtml(card.name)}</h3>
+
+        <p>${escapeHtml(card.pron)}</p>
+
+        <p>
+          ${item.orientation==="reversed"
+            ? "↓ ไพ่กลับหัว"
+            : "↑ ไพ่หงาย"}
+        </p>
+
+        <div class="ai-keywords">
+          ${keywords.map(k=>`
+            <span>${escapeHtml(k)}</span>
+          `).join("")}
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+
+/* =========================================================
+   QUESTION
+========================================================= */
+
+function updateQuestionPreview(){
+
+  const q=questionText();
+
+  document.getElementById("smartQuestionPreview").innerHTML=
+    `<b>คำถาม:</b> ${
+      q
+        ? escapeHtml(q)
+        : "ยังไม่ได้ใส่คำถาม"
+    }`;
+
+}
+
+
+/* =========================================================
+   SMART READING
+========================================================= */
+
+function buildContextSentence(card,orientation){
+
+  if(!card) return "";
+
+  const keywords=
+    orientation==="reversed"
+      ? card.keywordsR
+      : card.keywordsU;
+
+  return keywords.join(" / ");
+
+}
+
+function buildPositionReading(index){
+
+  const q=questionText();
+
+  const pos=SPREADS[currentSpread].positions[index];
+
+  const item=reading.cards[index];
+
+  const card=item.cardId ? getCard(item.cardId) : null;
+
+  if(!card){
+
+    return `
+      <div class="ai-position">
+        <h4>${index+1}. ${escapeHtml(pos.name)}</h4>
+        <p>ตำแหน่งนี้ยังไม่ได้เลือกไพ่</p>
+      </div>
+    `;
+
+  }
+
+  const keywords=
+    item.orientation==="reversed"
+      ? card.keywordsR
+      : card.keywordsU;
+
+  const overall=card.meaning.overall;
+
+  const orientationText=
+    item.orientation==="reversed"
+      ? "เมื่ออ่านกลับหัว ให้เน้นด้านที่ติดขัด สิ่งที่ต้องทบทวน หรือพลังของไพ่ที่ยังไม่ไหลเต็มที่"
+      : "เมื่ออ่านหงาย ให้เน้นพลังหลักและศักยภาพของไพ่";
+
+  return `
+
+    <div class="ai-position">
+
+      <h4>
+        ${index+1}. ${escapeHtml(pos.name)}
+        — ${escapeHtml(card.name)}
+      </h4>
+
+      <div class="mini-meta">
+        ${escapeHtml(pos.meaning)}
+      </div>
+
+      <div class="ai-keywords">
+
+        ${keywords.map(k=>`
+          <span>${escapeHtml(k)}</span>
+        `).join("")}
+
+      </div>
+
+      <p>
+        <b>โยงกับคำถาม:</b>
+        ${
+          q
+          ? `เมื่อเอาไพ่ใบนี้มาอ่านกับคำถาม
+             “${escapeHtml(q)}”
+             ประเด็นที่ควรดูคือ
+             ${escapeHtml(overall)}
+             โดยตำแหน่งนี้กำลังถามเรื่อง
+             ${escapeHtml(pos.meaning)}
+             `
+          : "ใส่คำถามก่อน เพื่อให้การอ่านโยงกับเรื่องที่ถามจริง"
+        }
+      </p>
+
+      <p>
+        <b>ทิศทางการอ่าน:</b>
+        ${orientationText}
+      </p>
+
+      <p>
+        <b>ด้านที่เกี่ยวข้อง:</b>
+        ${escapeHtml(card.meaning.overall)}
+      </p>
+
+    </div>
+
+  `;
+
+}
+
+function smartReadCurrent(){
+
+  const result=document.getElementById("smartReadingResult");
+
+  result.innerHTML=`
+
+    <div class="ai-question">
+      <b>คำถาม:</b>
+      ${questionText()
+        ? escapeHtml(questionText())
+        : "ยังไม่ได้ใส่คำถาม"}
+    </div>
+
+    ${buildPositionReading(activePosition)}
+
+  `;
+
+}
+
+function smartReadCard(){
+
+  const item=reading.cards[activePosition];
+
+  const card=item?.cardId ? getCard(item.cardId) : null;
+
+  const result=document.getElementById("smartReadingResult");
+
+  if(!card){
+
+    result.innerHTML=`
+      <div class="empty-state">
+        กรุณาเลือกไพ่ก่อน
+      </div>
+    `;
+
+    return;
+  }
+
+  const keywords=
+    item.orientation==="reversed"
+      ? card.keywordsR
+      : card.keywordsU;
+
+  const direction=
+    item.orientation==="reversed"
+      ? "กลับหัว"
+      : "หงาย";
+
+  result.innerHTML=`
+
+    <div class="ai-question">
+      <b>คำถาม:</b>
+      ${questionText()
+        ? escapeHtml(questionText())
+        : "ยังไม่ได้ใส่คำถาม"}
+    </div>
+
+    <div class="ai-position">
+
+      <h4>
+        🃏 ${escapeHtml(card.name)}
+      </h4>
+
+      <p>
+        ${escapeHtml(card.pron)}
+        · ${direction}
+      </p>
+
+      <div class="ai-keywords">
+        ${keywords.map(k=>`
+          <span>${escapeHtml(k)}</span>
+        `).join("")}
+      </div>
+
+      <p>
+        <b>ภาพรวม:</b>
+        ${escapeHtml(card.meaning.overall)}
+      </p>
+
+      <div class="meaning-grid">
+
+        <div class="meaning-box">
+          <b>เงิน</b>
+          <span>${escapeHtml(card.meaning.money)}</span>
+        </div>
+
+        <div class="meaning-box">
+          <b>งาน</b>
+          <span>${escapeHtml(card.meaning.work)}</span>
+        </div>
+
+        <div class="meaning-box">
+          <b>ความรัก</b>
+          <span>${escapeHtml(card.meaning.love)}</span>
+        </div>
+
+        <div class="meaning-box">
+          <b>ครอบครัว</b>
+          <span>${escapeHtml(card.meaning.family)}</span>
+        </div>
+
+        <div class="meaning-box">
+          <b>อนาคต</b>
+          <span>${escapeHtml(card.meaning.future)}</span>
+        </div>
+
+      </div>
+
+      <p>
+        <b>YES / NO / MAYBE:</b>
+        ${escapeHtml(card.yes)}
+      </p>
+
+    </div>
+
+  `;
+
+}
+
+function smartReadAll(){
+
+  const selected=
+    reading.cards
+      .map((item,index)=>({
+        index,
+        item,
+        card:item.cardId ? getCard(item.cardId) : null
+      }))
+      .filter(x=>x.card);
+
+  const result=document.getElementById("smartReadingResult");
+
+  if(!selected.length){
+
+    result.innerHTML=`
+      <div class="empty-state">
+        ยังไม่มีไพ่ที่เลือก
+      </div>
+    `;
+
+    return;
+  }
+
+  const q=questionText();
+
+  const keywordMap={};
+
+  selected.forEach(x=>{
+
+    const keys=
+      x.item.orientation==="reversed"
+        ? x.card.keywordsR
+        : x.card.keywordsU;
+
+    keys.forEach(k=>{
+      keywordMap[k]=(keywordMap[k]||0)+1;
+    });
+
+  });
+
+  const themes=
+    Object.entries(keywordMap)
+      .sort((a,b)=>b[1]-a[1])
+      .slice(0,6)
+      .map(x=>x[0]);
+
+  const upright=
+    selected.filter(x=>x.item.orientation==="upright").length;
+
+  const reversed=
+    selected.filter(x=>x.item.orientation==="reversed").length;
+
+  const orderText=
+    selected
+      .map(x=>`${x.index+1}. ${x.card.name}`)
+      .join(" → ");
+
+  let overall="";
+
+  if(q){
+
+    overall=
+      `เมื่ออ่านทั้งชุดกับคำถาม “${q}”
+       ไพ่ชุดนี้เน้นธีม ${themes.join(" / ")}
+       และควรอ่านตามความหมายของแต่ละตำแหน่งร่วมกัน
+       มากกว่าตัดสินจากไพ่ใบเดียว`;
+
+  }else{
+
+    overall=
+      `ภาพรวมของไพ่ชุดนี้เน้นธีม ${themes.join(" / ")}
+       ควรใส่คำถามจริงเพื่อให้การอ่านเฉพาะเจาะจงมากขึ้น`;
+
+  }
+
+  result.innerHTML=`
+
+    <div class="ai-question">
+      <b>คำถาม:</b>
+      ${q
+        ? escapeHtml(q)
+        : "ยังไม่ได้ใส่คำถาม"}
+    </div>
+
+    <div class="ai-summary">
+
+      <h4>✨ ภาพรวมไพ่ทั้งหมด</h4>
+
+      <p>
+        ${escapeHtml(overall)}
+      </p>
+
+      <p>
+        <b>ลำดับไพ่:</b>
+        ${escapeHtml(orderText)}
+      </p>
+
+      <p>
+        <b>ธีมที่ปรากฏ:</b>
+      </p>
+
+      <div class="ai-keywords">
+        ${themes.map(k=>`
+          <span>${escapeHtml(k)}</span>
+        `).join("")}
+      </div>
+
+      <p>
+        <b>ทิศทาง:</b>
+        หงาย ${upright} ใบ · กลับหัว ${reversed} ใบ
+      </p>
+
+    </div>
+
+    ${selected.map(x=>buildPositionReading(x.index)).join("")}
+
+    <div class="ai-summary">
+
+      <h4>📌 การเชื่อมภาพรวม</h4>
+
+      <p>
+        อ่านจากตำแหน่งต้นทางไปตำแหน่งปลายทาง
+        โดยดูว่าธีมของไพ่เปลี่ยนจาก
+        “สถานการณ์ / ปัจจัย / การตอบสนอง”
+        ไปสู่ “แนวทาง / แนวโน้ม” อย่างไร
+      </p>
+
+      <p>
+        <b>ข้อควรจำ:</b>
+        การอ่านนี้เป็นเครื่องมือช่วยตีความจากข้อมูลของไพ่
+        ไม่ใช่การยืนยันว่าเหตุการณ์จะเกิดขึ้นแน่นอน
+      </p>
+
+    </div>
+
+  `;
+
+}
+
+
+/* =========================================================
+   SUMMARY
+========================================================= */
+
+function interpretReading(){
+
+  smartReadAll();
+
+}
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+function resetReading(){
+
+  reading.question="";
+
+  document.getElementById("questionInput").value="";
+
+  activePosition=0;
+
+  createEmptyReading();
+
+  renderEverything();
+
+  document.getElementById("smartReadingResult").innerHTML=
+    "เริ่มการเปิดไพ่ใหม่แล้ว";
+
+}
+
+
+/* =========================================================
+   SAVE
+========================================================= */
+
+function saveReading(){
+
+  const q=questionText();
+
+  if(!q){
+
+    alert("กรุณาใส่คำถามก่อนบันทึก");
+
+    return;
+
+  }
+
+  const selected=
+    reading.cards
+      .map((x,index)=>{
+
+        const card=x.cardId ? getCard(x.cardId) : null;
+
+        if(!card) return null;
+
+        return {
+          position:index+1,
+          card:card.name,
+          orientation:x.orientation
+        };
+
+      })
+      .filter(Boolean);
+
+  if(!selected.length){
+
+    alert("กรุณาเลือกไพ่อย่างน้อย 1 ใบ");
+
+    return;
+
+  }
+
+  const record={
+
+    id:Date.now(),
+
+    date:new Date().toLocaleString("th-TH"),
+
+    question:q,
+
+    spread:SPREADS[currentSpread].name,
+
+    cards:selected
+
+  };
+
+  notes.unshift(record);
+
+  localStorage.setItem(
+    "tarotNotes",
+    JSON.stringify(notes)
+  );
+
+  renderNotes();
+
+  alert("บันทึกเรียบร้อย");
+
+}
+
+
+/* =========================================================
+   NOTES
+========================================================= */
+
+function renderNotes(){
+
+  const el=document.getElementById("notesList");
+
+  if(!notes.length){
+
+    el.innerHTML=`
+      <div class="empty-state">
+        ยังไม่มีบันทึก
+      </div>
+    `;
+
+    return;
+
+  }
+
+  el.innerHTML=notes.map(note=>`
+
+    <div class="note">
+
+      <div class="note-date">
+        ${escapeHtml(note.date)}
+        · ${escapeHtml(note.spread)}
+      </div>
+
+      <div class="note-question">
+        ${escapeHtml(note.question)}
+      </div>
+
+      <div class="note-body">
+
+        ${note.cards.map(c=>`
+          ${c.position}. ${escapeHtml(c.card)}
+          (${c.orientation==="reversed"?"กลับหัว":"หงาย"})
+        `).join(" · ")}
+
+      </div>
+
+    </div>
+
+  `).join("");
+
+}
+
+function clearNotes(){
+
+  if(!notes.length) return;
+
+  if(!confirm("ต้องการล้างบันทึกทั้งหมดหรือไม่?")){
+    return;
+  }
+
+  notes=[];
+
+  localStorage.removeItem("tarotNotes");
+
+  renderNotes();
+
+}
+
+
+/* =========================================================
+   LIBRARY
+========================================================= */
+
+function setLibraryFilter(filter,button){
+
+  libraryFilter=filter;
+
+  const container=document.getElementById("page-library");
+
+  container.querySelectorAll(".filter-btn")
+    .forEach(btn=>btn.classList.remove("active"));
+
+  if(button){
+    button.classList.add("active");
+  }
+
+  renderLibrary();
+
+}
+
+function renderLibrary(){
+
+  const el=document.getElementById("libraryGrid");
+
+  if(!el) return;
+
+  const search=
+    (document.getElementById("librarySearch")?.value || "")
+      .trim()
+      .toLowerCase();
+
+  let cards=CARDS;
+
+  if(libraryFilter==="major"){
+    cards=cards.filter(c=>c.type==="major");
+  }
+
+  if(["wands","cups","swords","pentacles"].includes(libraryFilter)){
+    cards=cards.filter(c=>c.suit===libraryFilter);
+  }
+
+  if(search){
+
+    cards=cards.filter(c=>{
+
+      const text=[
+        c.name,
+        c.pron,
+        c.number,
+        ...c.keywordsU,
+        ...c.keywordsR,
+        ...Object.values(c.meaning)
+      ].join(" ").toLowerCase();
+
+      return text.includes(search);
+
+    });
+
+  }
+
+  if(!cards.length){
+
+    el.innerHTML=`
+      <div class="empty-state">
+        ไม่พบไพ่ที่ค้นหา
+      </div>
+    `;
+
+    return;
+
+  }
+
+  el.innerHTML=cards.map(card=>`
+
+    <article
+      class="library-card"
+      onclick="openCardDetail('${card.id}')"
+    >
+
+      ${imageHtml(card)}
+
+      <div class="library-name">
+        ${escapeHtml(card.name)}
+      </div>
+
+      <div class="library-pron">
+        ${escapeHtml(card.pron)}
+      </div>
+
+      <div class="library-mini">
+
+        <span>${escapeHtml(card.yes)}</span>
+
+        <span>
+          ${escapeHtml(card.keywordsU[0])}
+        </span>
+
+      </div>
+
+    </article>
+
+  `).join("");
+
+}
+
+
+/* =========================================================
+   CARD DETAIL
+========================================================= */
+
+function openCardDetail(id){
+
+  const card=getCard(id);
+
+  if(!card) return;
+
+  const content=document.getElementById("detailContent");
+
+  content.innerHTML=`
+
+    <div class="detail-layout">
+
+      <div class="detail-image">
+        ${imageHtml(card)}
+      </div>
+
+      <div class="detail-info">
+
+        <h2>${escapeHtml(card.name)}</h2>
+
+        <div class="pron">
+          ${escapeHtml(card.pron)}
+        </div>
+
+        <div class="mini-meta">
+          ${card.type==="major"
+            ? "Major Arcana"
+            : `${escapeHtml(card.suit)} · Minor Arcana`}
+        </div>
+
+        <div class="detail-section">
+
+          <h3>↑ คีย์เวิร์ดหงาย</h3>
+
+          <div class="ai-keywords">
+            ${card.keywordsU.map(k=>`
+              <span>${escapeHtml(k)}</span>
+            `).join("")}
+          </div>
+
+        </div>
+
+        <div class="detail-section">
+
+          <h3>↓ คีย์เวิร์ดกลับหัว</h3>
+
+          <div class="ai-keywords">
+            ${card.keywordsR.map(k=>`
+              <span>${escapeHtml(k)}</span>
+            `).join("")}
+          </div>
+
+        </div>
+
+        <div class="detail-section">
+
+          <h3>YES / NO / MAYBE</h3>
+
+          <p>${escapeHtml(card.yes)}</p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="detail-section">
+
+      <h3>ความหมายแยกด้าน</h3>
+
+      <div class="meaning-grid">
+
+        <div class="meaning-box">
+          <b>เงิน</b>
+          <span>${escapeHtml(card.meaning.money)}</span>
+        </div>
+
+        <div class="meaning-box">
+          <b>งาน</b>
+          <span>${escapeHtml(card.meaning.work)}</span>
+        </div>
+
+        <div class="meaning-box">
+          <b>ความรัก</b>
+          <span>${escapeHtml(card.meaning.love)}</span>
+        </div>
+
+        <div class="meaning-box">
+          <b>ครอบครัว</b>
+          <span>${escapeHtml(card.meaning.family)}</span>
+        </div>
+
+        <div class="meaning-box">
+          <b>อนาคต</b>
+          <span>${escapeHtml(card.meaning.future)}</span>
+        </div>
+
+        <div class="meaning-box">
+          <b>ภาพรวม</b>
+          <span>${escapeHtml(card.meaning.overall)}</span>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="detail-section">
+
+      <h3>ใช้กับการช่วยอ่าน</h3>
+
+      <button
+        class="btn primary"
+        onclick="useCardFromLibrary('${card.id}')"
+      >
+        🃏 ใช้ไพ่ใบนี้ในการเปิดไพ่
+      </button>
+
+    </div>
+
+  `;
+
+  document.getElementById("detailModal").classList.add("open");
+
+}
+
+function closeCardDetail(){
+
+  document.getElementById("detailModal")
+    .classList.remove("open");
+
+}
+
+function closeDetailOutside(event){
+
+  if(event.target.id==="detailModal"){
+    closeCardDetail();
+  }
+
+}
+
+function useCardFromLibrary(id){
+
+  closeCardDetail();
+
+  showPage("reader");
+
+  reading.cards[activePosition]={
+    cardId:id,
+    orientation:"upright"
+  };
+
+  renderEverything();
+
+}
+
+
+/* =========================================================
+   PAGE NAVIGATION
+========================================================= */
+
+function showPage(page){
+
+  document.querySelectorAll(".page")
+    .forEach(el=>el.classList.remove("active"));
+
+  const target=document.getElementById(`page-${page}`);
+
+  if(target){
+    target.classList.add("active");
+  }
+
+  document.querySelectorAll(".nav-btn")
+    .forEach(btn=>btn.classList.remove("active"));
+
+  const nav=document.getElementById(`nav-${page}`);
+
+  if(nav){
+    nav.classList.add("active");
+  }
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+
+  if(page==="library"){
+    renderLibrary();
+  }
+
+  if(page==="notes"){
+    renderNotes();
+  }
+
+}
+
+
+/* =========================================================
+   START
+========================================================= */
+
+init();
+
+</script>
+
+</body>
+</html>
